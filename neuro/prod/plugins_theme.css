@@ -1,0 +1,39 @@
+/*
+ * File:        plugins_theme.css
+ * Type:        text/css
+ * Description: Color theme for NĖURO plugins
+ * NOTE:        This file is NOT part of NĖURO
+ */
+
+* {
+    --color-card-axis-foreground:               #3BA99C; /* Color used as background for card content                               */
+    --color-card-grid-foreground:               #C3E5E1; /* Color used as background for card content                               */
+    --color-card-table-chart-foreground:        #CD7EAF; /* Color used as foreground for card table header foreground               */
+    --color-card-table-header-foreground:       #000000; /* Color used as foreground for card table header foreground               */
+    --color-card-table-header-grid-foreground:  #FFFFFF; /* Color used as foreground for card table header grid foreground          */
+    --color-card-table-header-background:       #E7A4B6; /* Color used as background for card table header background               */
+    --color-card-table-odd-rows-foreground:     #000000; /* Color used as foreground for card table odd rows                        */
+    --color-card-table-odd-rows-background:     #EFEFEF; /* Color used as background for card table odd rows                        */
+    --color-card-data-series-0-background:      #F3CEC9; /* Color used as background for card data series 0/10                      */
+    --color-card-data-series-1-background:      #E7A4B6; /* Color used as background for card data series 1/10                      */
+    --color-card-data-series-2-background:      #CD7EAF; /* Color used as background for card data series 2/10                      */
+    --color-card-data-series-3-background:      #A262A9; /* Color used as background for card data series 3/10                      */
+    --color-card-data-series-4-background:      #6F4D96; /* Color used as background for card data series 4/10                      */
+    --color-card-data-series-5-background:      #3D3B72; /* Color used as background for card data series 5/10                      */
+    --color-card-data-series-6-background:      #182844; /* Color used as background for card data series 6/10                      */
+    --color-card-data-series-7-background:      #FFFFFF; /* Color used as background for card data series 7/10                      */
+    --color-card-data-series-8-background:      #FFFFFF; /* Color used as background for card data series 8/10                      */
+    --color-card-data-series-9-background:      #FFFFFF; /* Color used as background for card data series 9/10                      */
+    --color-card-data-series-0-foreground:      #000000; /* Color used as foreground for card data series 0/10                      */
+    --color-card-data-series-1-foreground:      #FFC600; /* Color used as foreground for card data series 1/10                      */
+    --color-card-data-series-2-foreground:      #00A9E0; /* Color used as foreground for card data series 2/10                      */
+    --color-card-data-series-3-foreground:      #004F71; /* Color used as foreground for card data series 3/10                      */
+    --color-card-data-series-4-foreground:      #00B74F; /* Color used as foreground for card data series 4/10                      */
+    --color-card-data-series-5-foreground:      #E73C3E; /* Color used as foreground for card data series 5/10                      */
+    --color-card-data-series-6-foreground:      #E27B45; /* Color used as foreground for card data series 6/10                      */
+    --color-card-data-series-7-foreground:      #662815; /* Color used as foreground for card data series 7/10                      */
+    --color-card-data-series-8-foreground:      #8C9047; /* Color used as foreground for card data series 8/10                      */
+    --color-card-data-series-9-foreground:      #7B287D; /* Color used as foreground for card data series 9/10                      */
+}
+
+/* EOF */

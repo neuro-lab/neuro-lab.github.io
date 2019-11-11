@@ -1,0 +1,171 @@
+<!--
+File:        build.xml
+Type:        text/xml
+Description: NĖURO Ant build script
+-->
+
+<!--
+MIT License
+
+Copyright (c) 2019 Nėuro Lab
+https://neuro-lab.github.io
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Home:   https://neuro-lab.github.io
+E-Mail: neuro.lab.team@gmail.com
+
+-->
+
+<project name="neuro" default="main">
+	<property name="tmp" value="${java.io.tmpdir}" />
+	<property name="dist" value="${basedir}/dist" />
+	<property name="demo" value="${basedir}/demo" />
+	<property name="examples" value="${basedir}/examples" />
+
+
+	<!-- main -->
+	<target name="main" depends="examples,demo,browser-client,linux-64-client" />
+
+
+	<!-- examples -->
+	<target name="examples" description="Build NĖURO project">
+		<echo message="Building: neuro-examples" />
+		<delete file="${tmp}/neuro-examples" />
+		<copy file="${basedir}/LICENSE" tofile="${tmp}/neuro-examples/LICENSE" />
+		<copy todir="${tmp}/neuro-examples">
+			<fileset dir="${basedir}/neuro/prod">
+				<include name="index.html" />
+				<include name="theme.css" />
+				<include name="icon192x192.png" />
+				<include name="icon512x512.png" />
+				<include name="sw.js" />
+			</fileset>
+		</copy>
+		<copy todir="${tmp}/neuro-examples">
+			<fileset dir="${basedir}/examples">
+				<include name="backend/**" />
+				<include name="config.js" />
+				<include name="plugins/**" />
+			</fileset>
+		</copy>
+		<chmod perm="700" type="file">
+			<fileset dir="${tmp}/neuro-examples/backend">
+				<include name="**/*.py" />
+			</fileset>
+		</chmod>
+		<property name="examples-zip" value="${dist}/neuro-examples.zip" />
+		<delete file="${examples-zip}" />
+		<zip destfile="${examples-zip}" basedir="${tmp}">
+			<include name="neuro-examples/**" />
+			<exclude name="neuro-examples/backend/**/*.py" />
+			<zipfileset filemode="700" dir="${tmp}" includes="neuro-examples/backend/**/*.py" />
+		</zip>
+	</target>
+
+
+	<!-- linux-64-client.zip -->
+	<target name="linux-64-client" description="Build NĖURO project">
+		<echo message="Building: neuro-linux-64-client.zip" />
+		<property name="neuro-linux-64-client-tmp" value="${tmp}/neuro-linux-64-client" />
+		<delete file="${neuro-linux-64-client-tmp}" />
+		<copy todir="${neuro-linux-64-client-tmp}/bin">
+			<fileset dir="${nw_sdk}" />
+		</copy>
+		<copy file="${basedir}/neuro/start.sh" tofile="${neuro-linux-64-client-tmp}/start.sh" />
+		<chmod file="${neuro-linux-64-client-tmp}/start.sh" perm="700" />
+		<chmod file="${neuro-linux-64-client-tmp}/bin/nw" perm="700" />
+		<copy file="${basedir}/neuro/README.html" tofile="${neuro-linux-64-client-tmp}/README.html" />
+		<copy file="${basedir}/LICENSE" tofile="${neuro-linux-64-client-tmp}/LICENSE" />
+		<copy todir="${neuro-linux-64-client-tmp}/bin/prod">
+			<fileset dir="${basedir}/neuro/prod">
+				<include name="index.html" />
+				<include name="theme.css" />
+				<include name="icon192x192.png" />
+				<include name="icon512x512.png" />
+				<include name="config_stub.js" />
+				<include name="sw.js" />
+				<!-- Stuff used in NW -->
+				<include name="main.js" />
+				<include name="package.json" />
+				<include name="nw-icons/**" />
+			</fileset>
+		</copy>
+		<move file="${neuro-linux-64-client-tmp}/bin/prod/config_stub.js" tofile="${neuro-linux-64-client-tmp}/bin/prod/config.js" />
+		<property name="neuro-linux-64-client-dist" value="${dist}/neuro-linux-64-client.zip" />
+		<delete file="${neuro-linux-64-client-dist}" />
+		<zip destfile="${neuro-linux-64-client-dist}">
+			<zipfileset filemode="700" dir="${tmp}" includes="neuro-linux-64-client/**" />
+		</zip>
+	</target>
+
+	<!-- browser-client.zip -->
+	<target name="browser-client" description="Build NĖURO project">
+		<echo message="Building: neuro-browser-client.zip" />
+		<property name="neuro-browser-client-tmp" value="${tmp}/neuro-browser-client" />
+		<delete file="${neuro-browser-client-tmp}" />
+		<copy file="${basedir}/neuro/README.html" tofile="${neuro-browser-client-tmp}/README.html" />
+		<copy file="${basedir}/LICENSE" tofile="${neuro-browser-client-tmp}/LICENSE" />
+		<copy todir="${neuro-browser-client-tmp}">
+			<fileset dir="${basedir}/neuro/prod">
+				<include name="index.html" />
+				<include name="theme.css" />
+				<include name="icon192x192.png" />
+				<include name="icon512x512.png" />
+				<include name="config_stub.js" />
+				<include name="sw.js" />
+			</fileset>
+		</copy>
+		<move file="${neuro-browser-client-tmp}/config_stub.js" tofile="${neuro-browser-client-tmp}/config.js" />
+		<property name="neuro-browser-client-dist" value="${dist}/neuro-browser-client.zip" />
+		<delete file="${neuro-browser-client-dist}" />
+		<zip destfile="${neuro-browser-client-dist}" basedir="${tmp}">
+			<include name="neuro-browser-client/**" />
+		</zip>
+	</target>
+
+	<!-- demo -->
+	<target name="demo" description="Build NĖURO project">
+		<echo message="Building: neuro-demo" />
+		<delete file="${demo}/neuro-demo" />
+		<copy file="${basedir}/neuro/README.html" tofile="${demo}/neuro-demo/README.html" />
+		<copy file="${basedir}/LICENSE" tofile="${demo}/neuro-demo/LICENSE" />
+		<copy todir="${demo}/neuro-demo">
+			<fileset dir="${basedir}/neuro/prod">
+				<include name="index.html" />
+				<include name="theme.css" />
+				<include name="icon192x192.png" />
+				<include name="icon512x512.png" />
+				<include name="config.js" />
+				<include name="sw.js" />
+				<include name="assets/**" />
+				<include name="plugins/**" />
+				<include name="data/**" />
+			</fileset>
+		</copy>
+		<property name="demo-zip" value="${dist}/neuro-demo.zip" />
+		<delete file="${demo-zip}" />
+		<zip destfile="${demo-zip}" basedir="${demo}">
+			<include name="neuro-demo/**" />
+		</zip>
+	</target>
+
+</project>
+
+<!-- EOF -->

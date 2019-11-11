@@ -1,0 +1,72 @@
+/*
+ * File:        theme.css
+ * Type:        text/css
+ * Description: NĖURO color theme
+ * NOTE:        The 'theme.css' file is required by NĖURO and must be in same directory as file 'index.html' 
+ */
+
+/*
+MIT License
+
+Copyright (c) 2019 Nėuro Lab
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Home:   https://neuro-lab.github.io
+E-Mail: neuro.lab.team@gmail.com
+
+*/
+
+* {
+
+    --color-theme-background:                   #00C0EF; /* Color used as theme on mobile devices                                   */
+    --color-desktop-background:                 #CEEEEE; /* Color used as background for dashboard main panel                       */
+    --color-desktop-scrollbar-track-background: #F3CEC9; /* Color used as background for desktop scrollbar-track                    */
+    --color-desktop-scrollbar-thumb-background: #21897E; /* Color used as background for desktop scrollbar-thumb                    */
+    --color-selection-background:               #0073B7; /* Color used as background for mark                                       */
+    --color-selection-foreground:               #FFFFFF; /* Color used as foreground for mark                                       */
+    --color-mark-background:                    #F8C80B; /* Color used as background for mark                                       */
+    --color-mark-foreground:                    #000000; /* Color used as foreground for mark                                       */
+    --color-indicator-online-background:        #01E4F4; /* Color used as background for online status indicator                    */
+    --color-indicator-offline-background:       #FF0000; /* Color used as background for offline status indicator                   */
+    --color-indicator-online-foreground:        #01E4F4; /* Color used as background for online status indicator                    */
+    --color-indicator-offline-foreground:       #CCCCCC; /* Color used as background for offline status indicator                   */
+    --color-header-background:                  #21897E; /* Color used as background for dashboard header                           */
+    --color-header-side-background:             #000000; /* Color used as gradient background for dashboard header                  */
+    --color-header-button-foreground:           #FFFFFF; /* Color used as foreground for dashboard header buttons                   */
+    --color-header-clock-foreground:            #FFFFFF; /* Color used as foreground for dashboard clock                            */
+    --color-header-clock-separator-foreground:  #FFFFFF; /* Color used as foreground for dashboard clock separator (:)              */
+    --color-header-text-foreground:             #FFFFFF; /* Color used as foreground for dashboard header text (title and subtitle) */
+    --color-footer-background:                  #21897E; /* Color used as background for dashboard footer                           */
+    --color-footer-side-background:             #000000; /* Color used as gradient background for dashboard footer                  */
+    --color-footer-button-foreground:           #FFFFFF; /* Color used as foreground for dashboard footer buttons                   */
+    --color-slot-title-bar-background:          #69D1C5; /* Color used as background for slot title bar                             */
+    --color-slot-title-bar-text-foreground:     #333333; /* Color used as foreground for slot title bar                             */
+    --color-slot-title-bar-button-foreground:   #FFFFFF; /* Color used as foreground for slot buttons                               */
+    --color-card-title-bar-background:          #3BA99C; /* Color used as background for card title bar                             */
+    --color-card-title-bar-side-background:     #C3E5E1; /* Color used as gradient background for card title bar                    */
+    --color-card-title-bar-text-foreground:     #333333; /* Color used as foreground for card title bar                             */
+    --color-card-title-bar-button-foreground:   #69D1C5; /* Color used as foreground for card buttons                               */
+    --color-card-content-background:            #FFFFFF; /* Color used as background for card content                               */
+    --color-card-scrollbar-track-background:    #F3CEC9; /* Color used as background for card scrollbar-track                       */
+    --color-card-scrollbar-thumb-background:    #CD7EAF; /* Color used as background for card scrollbar-thumb                       */
+
+}
+
+/* EOF */

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="description" content="NĖURO is a pure HTML/JavaScript dashboard helps to implement complex heterogeneous monitoring, control and analytical tools by using simple data models and standard communication protocols">
+<meta name="keywords" content="dashboard,frontend,JavaScript">
+
+<script src="assets/run_prettify.js"></script>
+<link href="assets/prettify.css" rel="stylesheet">
+
+<link rel="preconnect" href="https://neuro-lab.github.io" crossorigin>
+<link rel="preload" href="assets/fonts/yantramanav-v5-latin-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="assets/fonts/roboto-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="assets/fonts/roboto-condensed-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<link rel="prerender" href="//neuro-lab.github.io/index.html" crossorigin>
+<link rel="prerender" href="//neuro-lab.github.io/doc/hello-world.html" crossorigin>
+<link rel="prerender" href="//neuro-lab.github.io/doc/event-sources.html" crossorigin>
+<link rel="prerender" href="//neuro-lab.github.io/doc/nero-for-sturtups.html" crossorigin>
+<link rel="prerender" href="//neuro-lab.github.io/doc/quick-start.html" crossorigin>
+<link rel="prerender" href="//neuro-lab.github.io/neuro/prod/" crossorigin>
+
+<link rel="alternate" type="text/html" title="NĖURO on Github" href="https://github.com/neuro-lab/neuro-lab.github.io">
+
+<title>NĖURO – Event Sources</title>
+
+<style type="text/css">
+@font-face {
+	font-display: block;
+	font-family: 'yantramanav';
+	src: url('assets/fonts/yantramanav-v5-latin-regular.woff2') format('woff2')
+}
+
+@font-face {
+	font-display: block;
+	font-family: 'Roboto';
+	src: url('assets/fonts/roboto-regular.woff2') format('woff2')
+}
+
+@font-face {
+	font-display: block;
+	font-family: 'Roboto Condensed';
+	src: url('assets/fonts/roboto-condensed-regular.woff2') format('woff2')
+}
+
+html {
+	height: 100%;
+	min-height: 100%;
+	margin: 0;
+	padding: 0;
+	background: #8F8F8F;
+}
+
+html, html * {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: 'yantramanav' !important;
+	background: #fff;
+	padding-bottom: 5rem;
+}
+
+.header {
+	user-select: none;
+	cursor: pointer;
+	display: inline-block;
+	opacity: .6;
+	width: 100%;
+	height: auto;
+	text-align: center;
+	padding: 2rem;
+	padding-left: 0;
+	padding-right: 0;
+	background: #ccc;
+}
+
+.text {
+	font-family: 'Roboto Condensed', 'sans-serif-condensed', 'sans';
+	color: #000;
+}
+
+.title {
+	line-height: 6.5rem;
+	font-size: 6.5rem;
+	font-weight: bold;
+}
+
+.sub-title-1 {
+	font-size: 1.95rem;
+}
+
+.sub-title-2 {
+	font-size: 3.5rem;
+	margin-top: -1.8rem;
+}
+
+a {
+	text-decoration: none;
+}
+
+a, a:hover, a:visited, a:active {
+	color: #0645ad;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+h1, h2 {
+	color: #444;
+	font-weight: bold;
+}
+
+h2 {
+	font-size: 1.5rem;
+	line-height: 1.3rem;
+	color: #c70d3a !important;
+	opacity: .6 !important;
+}
+
+h2 .h2-sub {
+	font-size: 1rem;
+}
+
+.brand {
+	font-family: 'Roboto Condensed', 'sans-serif-condensed', 'sans';
+}
+
+main {
+	padding-left: 4rem;
+	padding-right: 4rem;
+	font-size: 1rem;
+	color: #333;
+}
+
+.prettyprint {
+	background: #eee;
+	border: 1px solid #ddd !important;
+}
+
+.lang-js, .lang-py {
+	padding-top: 1rem !important;
+	padding-bottom: 1rem !important;
+	padding-left: 1rem !important;
+}
+
+@media only screen and (min-width: 960px) {
+	body {
+		width: 960px;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: 3rem;
+		margin-bottom: 3rem;
+		box-shadow: 3px 3px 8px rgba(0, 0, 0, .4);
+		border-radius: 5px;
+	}
+	main {
+		padding-left: 7rem;
+		padding-right: 3rem;
+	}
+}
+
+@media only screen and (max-width: 960px) {
+	body {
+		width: auto;
+	}
+	main {
+		padding-left: 4rem;
+		padding-right: 3rem;
+	}
+}
+</style>
+</head>
+<body>
+	<div class="header" onclick="javascript:window.location='https://neuro-lab.github.io'">
+		<span class="text title">N<span style="color: #c70d3a">Ė</span>URO</span>
+		<br>
+		<div class="text sub-title-1">100% PURE FRONTEND</div>
+		<br>
+		<div class="text sub-title-2">DASHBOARD</div>
+	</div>
+	<main> <br>
+	<br>
+	<h1>Event Sources</h1>
+	<div style="border-top: 1px solid #888;"></div>
+	<br>
+	<br>
+	<h2>Introduction</h2>
+	<br>
+	<p>
+		Dashboard gets data from backend by using event sources registered in 'config.js' file. Event sources registry is array contains objects with Event Sources definitions. Each object contains at least three mandatory fields:<br>
+		<br>
+	<ul style="margin-left: 1.5rem;">
+		<li><code class="prettyprint">type</code> (String) – Event Source type. Allowed values are: <code class="prettyprint">"WSS"</code>, <code class="prettyprint">"SSE"</code>, <code class="prettyprint">"FETCH"</code>, <code class="prettyprint">"FILE"</code></li>
+		<li><code class="prettyprint">url</code> (String) – Event Source URL</li>
+		<li><code class="prettyprint">events</code> (Array) – white list of emitted events names (other events will be ignored)</li>
+	</ul>
+	<br>
+	Each Event Source depends of used protocol can emit formatted or unformatted data. Server-sent Events (SSE) and File (FILE) event sources can contain field with event name, WebSocket (WSS) and Fetch (FETCH) can contain only raw data.
+	</p>
+	<br>
+	<br>
+	<br>
+	<h2>
+		WSS<br>
+		<span class="h2-sub">WebSocket Event Source (push)</span>
+	</h2>
+	<br>
+	<p>
+		WSS (WebSocket) event source can be used in case we want <em>push</em> data from server to dashboard. WSS (WebSocket) provide full-duplex communication channels over a single TCP connection, but dashboard use just server to client direction.
+	</p>
+	<br>
+	<strong>Definition in 'config.js' file:</strong> <br>
+	<ul style="margin-left: 1.5rem;">
+		<li><code class="prettyprint">type</code> (String) – <code class="prettyprint">"WSS"</code></li>
+		<li><code class="prettyprint">url</code> (String) – valid WebScocket Server URL (starts from <code class="prettyprint">"ws://"</code> or <code class="prettyprint">"wss://"</code>)</li>
+		<li><code class="prettyprint">events</code> (Array) – array of single entry with event name</li>
+	</ul>
+	<br>
+	<em>Example:</em> <pre class="prettyprint lang-js">
+sys_eventProviders = [
+    ...
+    {
+        type:   "WSS",                           // WebSocket event provider
+        url :   "wss://ws.weather.myserver.com", // WebSocket server URL
+        events: ["temperature"]                  // Event name
+    },
+    ...
+];
+				 </pre> <br>
+	<br>
+	<strong>Data format:</strong>
+	<p>
+		Unformatted raw character or binary data.<br>Please see: <a target="_blank" href="https://html.spec.whatwg.org/multipage/web-sockets.html">WebSockets Living Standard</a> for more information.
+	</p>
+	<br>
+	<em>Example:</em> <pre class="prettyprint lang-js">
+HELLO NĖURO!
+			</pre> <br>
+	<em>Example: <a target="_blank" href="../examples/backend/ws.py">ws.py</a> – Simple python3 script to send data through WebSocket</em> <pre class="prettyprint lang-py">
+#!/usr/bin/python3
+
+import time
+import random
+import asyncio
+import websockets
+
+async def send(websocket, path):
+
+    # Send the message
+    while True:
+        await websocket.send(str(random.randrange(10, 99)))
+        time.sleep(3)
+
+try:
+    HOST = 'localhost'
+    PORT = 8082
+
+    server = websockets.serve(send, HOST, PORT)
+    print('Server started.\nURL: ws://' + HOST + ':' + str(PORT))
+    asyncio.get_event_loop().run_until_complete(server)
+    asyncio.get_event_loop().run_forever()
+
+except KeyboardInterrupt:
+    asyncio.get_event_loop().stop()
+    print('\nServer ended.')
+    </pre> <br>
+	<br><br>
+	<h2>
+		SSE<br>
+		<span class="h2-sub">Server-sent Events Event Source (push)</span>
+	</h2>
+	<br>
+	<p>
+		SSE (Server-sent Events) event source can be used in case we want <em>push</em> data from server to dashboard. Unlike WebSockets, Server-sent Events are a one way communications channel - events flow from server to client only.
+	</p>
+	<br>
+	<strong>Definition in 'config.js' file:</strong> <br>
+	<ul style="margin-left: 1.5rem;">
+		<li><code class="prettyprint">type</code> (String) – <code class="prettyprint">"SSE"</code></li>
+		<li><code class="prettyprint">url</code> (String) – valid HTTP Server URL (starts from <code class="prettyprint">"http://"</code> or <code class="prettyprint">"https://"</code>)</li>
+		<li><code class="prettyprint">events</code> (Array) – array of event names</li>
+	</ul>
+	<br>
+	<em>Example:</em> <pre class="prettyprint lang-js">
+sys_eventProviders = [
+    ...
+    {
+        type:   "SSE",                             // Server-sent Events provider
+        url :   "http://sse.weather.myserver.com", // HTTP server URL
+        events: ["temperature", "humidity"]        // Event names
+    },
+    ...
+];
+			</pre> <br>
+	<br>
+	<strong>Data format:</strong>
+	<p>
+		Character data in standard Server-sent Events format.<br>Please see: <a target="_blank" href="https://html.spec.whatwg.org/multipage/server-sent-events.html">Server-sent Events Living Standard</a> for more information.
+	</p>
+	<br>
+	<em>Example:</em> <pre class="prettyprint lang-js">
+event: usermessage
+data: HELLO NĖURO!
+			</pre> <br>
+	<em>Example: <a target="_blank" href="../examples/backend/sse.py">sse.py</a> – Simple python3 script to send data through Server-sent Events</em> <pre class="prettyprint lang-py">
+#!/usr/bin/python3
+
+import time
+import random
+from http.server import BaseHTTPRequestHandler,HTTPServer
+
+# HTTP request handler
+class myHandler(BaseHTTPRequestHandler):
+
+    # Handle GET method
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Content-Type', 'text/event-stream')
+        self.send_header('Cache-Control', 'no-cache')
+        self.send_header('Connection', 'keep-alive')
+        self.end_headers()
+
+        # Send the message
+        while True:
+            self.wfile.write(bytes('event: temperature_sse\n','utf-8'))
+            self.wfile.write(bytes('data: ' + str(random.randrange(10, 99)) + '\n\n','utf-8'))
+            time.sleep(3)
+
+try:
+    HOST = 'localhost'
+    PORT = 8081
+
+    server = HTTPServer((HOST, PORT), myHandler)
+    print('Server started.\nURL: http://' + HOST + ':' + str(PORT))
+    server.serve_forever()
+
+except KeyboardInterrupt:
+    server.socket.close()
+    print('\nServer ended.')
+			</pre> <br>
+	<br><br>
+	<h2>
+		FETCH<br>
+		<span class="h2-sub">Fetch Event Source (pull)</span>
+	</h2>
+	<br>
+	<p>
+		FETCH (Fetch) event source can be used in case we want <em>pull</em> data from server to dashboard. Unlike WebSockets and Server-sent Events Fetch pull data from server to client.
+	</p>
+	<br>
+	<strong>Definition in 'config.js' file:</strong> <br>
+	<ul style="margin-left: 1.5rem;">
+		<li><code class="prettyprint">type</code> (String) – <code class="prettyprint">"FETCH"</code></li>
+		<li><code class="prettyprint">url</code> (String) – valid HTTP Server URL (starts from <code class="prettyprint">"http://"</code> or <code class="prettyprint">"https://"</code>)</li>
+		<li><code class="prettyprint">events</code> (Array) – array of single entry with event name</li>
+		<li><code class="prettyprint">interval</code> (Number) – fetch interval in milliseconds</li>
+		<li><code class="prettyprint">method</code> (String) – HTTP request method. Default: <code class="prettyprint">"GET"</code></li>
+		<li><code class="prettyprint">body</code> (String, body types) – HTTP request body</li>
+		<li><code class="prettyprint">headers</code> (Object, Headers) – Default: <code class="prettyprint">{}</code></li>
+		<li><code class="prettyprint">credentials</code> (String) – Authentication credentials mode. Default: <code class="prettyprint">"omit"</code>
+			<ul style="margin-left: 1.5rem;">
+				<li><code class="prettyprint">"omit"</code> – don't include authentication credentials (e.g. cookies) in the request</li>
+				<li><code class="prettyprint">"same-origin"</code> – include credentials in requests to the same site</li>
+				<li><code class="prettyprint">"include"</code> – include credentials in requests to all sites</li>
+			</ul></li>
+	</ul>
+	<br>
+	<em>Example:</em> <pre class="prettyprint lang-js">
+sys_eventProviders = [
+    ...
+    {
+        type:   "FETCH",                           // Fetch provider
+        url :   "http://api.weather.myserver.com", // HTTP server URL
+        events: ["temperature"],                   // Event name
+        interval: 5000                             // pull interval (5 seconds)
+    },
+    ...
+];
+				 </pre> <br>
+	<br>
+	<strong>Data format:</strong>
+	<p>
+		Unformatted character or binary data.<br>Please see: <a target="_blank" href="https://fetch.spec.whatwg.org/">Fetch Living Standard</a> for more information.
+	</p>
+	<br>
+	<em>Example:</em> <pre class="prettyprint lang-js">
+HELLO NĖURO!
+			</pre> <br>
+	<em>Example: <a target="_blank" href="../examples/backend/fetch.py">fetch.py</a> – Simple python3 script to serve data for the Fetch API</em> <pre class="prettyprint lang-py">
+#!/usr/bin/python3
+
+import random
+from http.server import BaseHTTPRequestHandler,HTTPServer
+
+# HTTP request handler
+class myHandler(BaseHTTPRequestHandler):
+
+    # Handle GET method
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Content-Type', 'text/plain')
+        self.send_header('Cache-Control', 'no-cache')
+        self.end_headers()
+
+        # Send the message
+        self.wfile.write(bytes(str(random.randrange(10, 99)),'utf-8'))
+
+try:
+    HOST = 'localhost'
+    PORT = 8080
+
+    server = HTTPServer((HOST, PORT), myHandler)
+    print('Server started.\nURL: http://' + HOST + ':' + str(PORT))
+    server.serve_forever()
+
+except KeyboardInterrupt:
+    server.socket.close()
+    print('\nServer ended.')
+    		</pre> <br>
+	<br><br>
+	<h2>
+		FILE<br>
+		<span class="h2-sub">File Event Source (pull)</span>
+	</h2>
+	<br>
+	<p>FILE (File) event source can be used in case we want pull data from server or local file to dashboard. Unlike WebSockets and Server-sent Events File event source allow pull data from server to client. Unlike FETCH event source FILE event source allow to pull data from local files by using file:// protocol).</p>
+	<br>
+	<strong>Definition in 'config.js' file:</strong> <br>
+	<ul style="margin-left: 1.5rem;">
+		<li><code class="prettyprint">type</code> (String) – <code class="prettyprint">"FILE"</code></li>
+		<li><code class="prettyprint">url</code> (String) – valid JavaScript file URL (starts from <code class="prettyprint">"file://"</code>) or relative path or absolute path (starts from <code class="prettyprint">"/"</code>)</li>
+		<li><code class="prettyprint">events</code> (Array) – array of event names</li>
+		<li><code class="prettyprint">interval</code> (Number) – fetch interval in milliseconds</li>
+	</ul>
+	<br>
+	<em>Example:</em> <pre class="prettyprint lang-js">
+sys_eventProviders = [
+    ...
+    {
+        type:   "FILE",                      // File provider
+        url :   "my-event-provider.js",      // JavaScript data provider
+        events: ["temperature", "humidity"], // Event names
+        interval: 5000                       // pull interval (5 seconds)
+    },
+    ...
+];
+				 </pre> <br>
+	<br>
+	<strong>Data format:</strong>
+	<p>
+		JavaScript wrapped data with two mandatory fields:
+		<code class="prettyprint">"event"</code>
+		and
+		<code class="prettyprint">"data"</code>
+		<br>
+	</p>
+	<br>
+	<em>Example:</em> <pre class="prettyprint lang-js">
+event="usermessage"
+data="HELLO NĖURO!"
+			</pre> <br>
+	<em>Example: <a target="_blank" href="../examples/backend/file.py">file.py</a> – Simple python3 script to provide data for local file read</em> <pre class="prettyprint lang-py">
+#!/usr/bin/python3
+
+import time
+import random
+import os
+import tempfile
+
+file = os.path.join(tempfile.gettempdir(), "data.tmp")
+f = open(file, 'w')
+print('Start writing to file.\nURL: file://' + f.name)
+
+try:
+    while True:
+        # Write the message
+        f.seek(0)
+        f.write('event="temperature_file";data=' + str(random.randrange(10, 99)))
+        time.sleep(3)
+
+except KeyboardInterrupt:
+    f.close()
+    print('\nFile closed.')
+			</pre> <br>
+	<br>
+	<br>
+	<br>
+	<div style="border-top: 1px solid #888;"></div>
+	<div style="text-align: right; font-size: .8rem;">&copy; Copyright 2019 Nėuro Lab</div>
+	</main>
+</body>
+
+</html>

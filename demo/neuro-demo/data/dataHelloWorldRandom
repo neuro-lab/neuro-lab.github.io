@@ -1,0 +1,44 @@
+/*
+ * Simple JavaScript data provider for NĖURO dashboard
+ * This provider called periodically and generate random data
+ * 
+ * Two fields are required:
+ * 1) event - event name
+ * 2) data - arbitrary data string (E.g. JSON object serialized as string)
+ */
+
+// Part *** A ****
+// In this part we just emulate event data by extracting random entries from predefined array
+
+/**
+ * Generate random integer value
+ * 
+ * @param max - maximal generated value
+ * @returns random integer in range [0...max]
+ */
+function getRandomInt(max) {
+	return Math.floor(Math.random() * Math.floor(max));
+}
+
+// Some predefined array...
+array = [
+	{status: 0, message: "Hello World!"},       // entry 0
+	{status: 1, message: "Hello Red World!"},   // entry 1
+	{status: 2, message: "Hello Green World!"}, // entry 2
+	{status: 3, message: "Hello Blue World!"},  // entry 3
+]
+
+randIndex = getRandomInt(array.length); // get random array index
+entry = array[randIndex]; // get random entry
+
+
+
+// Part *** B ***
+// In this part we format event data before send it to dashboard
+// 'event' and 'data' fields will be received as parameter in onEvent() plugin method:
+event="hello_world"
+data=JSON.stringify({
+	status: entry['status'],
+	message: entry['message'],
+});
+
