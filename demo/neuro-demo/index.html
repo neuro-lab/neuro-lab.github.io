@@ -1,0 +1,2757 @@
+<!DOCTYPE html>
+
+<!--
+File:        index.html
+Type:        text/html
+Description: NĖURO HTML5 client
+-->
+<!-- 𝗡𝗘𝗨𝗥𝗢 -->
+
+<!--
+MIT License
+
+Copyright (c) 2019 Nėuro Lab
+https://neuro-lab.github.io
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Home:   https://neuro-lab.github.io
+E-Mail: neuro.lab.team@gmail.com
+
+-->
+<!--
+
+URL parameters:
+--------------
+
+help                                      - product documentation
+about                                     - information about product
+lang      <labuage code>, default: en     - interface language
+header    [ true (default) | false ]      - 'true' - show header, 'false' - hide header
+grayscale [ true | false (default) ]      - 'true' - grayscale mode, 'false' - color mode
+search    < text to search >              - show only cards with specified text in the title
+expand    [ 0 (default) | 1 | 2 ]         - expand mode '0' - cards opened, '1' - cards minimized, '2' -  slots minimized
+tags      < tag list >                    - show only cards with specified tags
+bookmarks [ on | off | on,off (default) ] - 'on' - show only bookmarked, 'off' - sh ow only non-bookmarked, 'on,off' - show both (bookmarked and non-bookmarked) 
+card      < card UI plugin URL >          - open specified card in maximized mode
+log       [ true | false (default) ]      - enable event logging
+debug     [ true | false (default) ]      - enable event logging to browser console
+
+PULL SOURCE (JavaScript)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+event="myevent";data={"temeprature":234,"pressure":4076}
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Card UI provider plugin interface:
+---------------------------------
+
+isInteractive(maximized) {
+    ...
+    return true; // default
+}
+
+isSelfHeight() {
+	...
+	return false; // default
+}
+
+onAttach(parentElement, lang) {
+    ...
+    return userObject;
+}
+
+onResize(parentElement, userObject) {
+    ...
+}
+
+onEvent(parentElement, userObject, event, data, lang) {
+    ...
+}
+
+onLang(parentElement, userObject, lang) {
+    ...
+}
+
+-->
+
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+
+<script>document.title = 'Loading...';</script>
+
+<link rel="preload" href="assets/roboto-condensed-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<link rel="stylesheet" type="text/css" href="theme.css">
+<style type="text/css">
+	/* Embedded: put here content of your 'theme.css' file */
+</style>
+
+<script src="config.js"></script>
+<script>
+	/* Embedded: put here content of your 'config.js' file */
+</script>
+<script type="text/javascript">
+
+'use strict';
+
+function setGrayscale(b) {
+	document.documentElement.style.filter = b ? 'grayscale(100%)' : '';
+	/* NW START */
+	if (typeof process !== "undefined")
+		miGrayscale.icon = b ? 'nw-icons/grayscale-off.png' : 'nw-icons/grayscale-on.png';
+	/* NW END */
+}
+//
+function isGrayscale() {
+	return document.documentElement.style.filter != '';
+}
+
+/* NW START */
+if (typeof process !== "undefined") {
+    let gui = require('nw.gui');
+    let win = gui.Window.get();
+    //
+    window.addEventListener("wheel", function (e) {
+        if (e.ctrlKey) {
+            if (e.deltaY > 0)
+                win.zoomLevel -= 0.1
+            else
+                win.zoomLevel += 0.1;
+        }
+    });
+
+    let menu = new nw.Menu({
+        type: 'menubar'
+    });
+
+    var fs = require("fs");
+    let os = require("os");
+
+    let menuCtx = new gui.Menu;
+
+    menuCtx.append(new gui.MenuItem({
+        label: "Cut",
+        key: 'x',
+        modifiers: 'ctrl',
+        click: function() {
+            document.execCommand("cut");
+        }
+    }));
+
+    menuCtx.append(new gui.MenuItem({
+        label: "Copy",
+        key: 'c',
+        modifiers: 'ctrl',
+        click: function() {
+            document.execCommand("copy");
+        }
+    }));
+
+    menuCtx.append(new gui.MenuItem({
+        label: "Paste",
+        key: 'v',
+        modifiers: 'ctrl',
+        click: function() {
+            document.execCommand("paste");
+        }
+    }));
+
+    document.addEventListener("contextmenu", function(e) {
+        e.preventDefault();
+        if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target.isContentEditable) {
+            menuCtx.popup(e.x, e.y);
+        }
+    });
+
+    let submenuFile = new nw.Menu();
+    let miClose = new nw.MenuItem({
+        label: ' Close',
+        icon: 'nw-icons/close.png'
+    });
+    miClose.click = function() {
+    	gui.App.quit();
+    };
+    submenuFile.append(miClose);
+    //
+    let submenuView = new nw.Menu();
+
+    let miFullscreen = new nw.MenuItem({
+        label: ' Fullscreen',
+        key: 'F11',
+    });
+    miFullscreen.icon = win.isFullscreen ? 'nw-icons/fullscreen-exit.png' : 'nw-icons/fullscreen.png';
+    miFullscreen.click = function() {
+        if (win.isFullscreen) {
+            win.leaveFullscreen();
+            miFullscreen.icon = 'nw-icons/fullscreen.png';
+        } else {
+            win.enterFullscreen();
+            miFullscreen.icon = 'nw-icons/fullscreen-exit.png';
+        }
+    };
+    submenuView.append(miFullscreen);
+    //
+
+    var miGrayscale = new nw.MenuItem({
+        label: ' Grayscale',
+        key: 'g',
+        modifiers: 'ctrl',
+        icon: isGrayscale() ? 'nw-icons/grayscale-off.png' : 'nw-icons/grayscale-on.png',
+    });
+
+    miGrayscale.click = function() {
+		let grayscale = !isGrayscale();
+		setGrayscale(grayscale);
+    };
+    submenuView.append(miGrayscale);
+    //
+    let miRefresh = new nw.MenuItem({
+        label: ' Refresh',
+        icon: 'nw-icons/refresh.png',
+        key: 'F5',
+    });
+    miRefresh.click = function() {
+        location.reload();
+    };
+    submenuView.append(miRefresh);
+    //
+    let submenuHelp = new nw.Menu();
+    //
+    let help_urlObj = sys_properties['help_url'];
+	if (help_urlObj !== undefined) {
+        let miHelp = new nw.MenuItem({
+            label: ' Help Contents',
+            icon: 'nw-icons/help.png',
+            key: 'F1',
+            click: function() {
+	 			let help_url = t.getString(help_urlObj);
+                gui.Shell.openExternal(helpUrl);
+            },
+        });
+        submenuHelp.append(miHelp);
+    }
+    //
+    var miAbout = new nw.MenuItem({
+        label: ' About',
+        icon: 'nw-icons/info.png',
+    });
+    submenuHelp.append(miAbout);
+
+    //
+    menu.append(new nw.MenuItem({
+        label: 'File',
+        submenu: submenuFile
+    }));
+    menu.append(new nw.MenuItem({
+        label: 'View',
+        submenu: submenuView
+    }));
+    menu.append(new nw.MenuItem({
+        label: 'Help',
+        submenu: submenuHelp
+    }));
+    nw.Window.get().menu = menu;
+    //
+    nw.App.registerGlobalHotKey(new nw.Shortcut({
+        key: "Escape",
+        active: function() {
+            win.leaveFullscreen();
+            miFullscreen.checked = false;
+        }
+    }));
+}
+/* NW END */
+
+function openInNewTab(href) {
+	let a = document.createElement('a');
+	a.target = '_blank';
+	a.href = href;
+	a.click();
+}
+
+function printText(s) {
+	document.documentElement.style.fontFamily = 'monospace';
+	document.documentElement.innerHTML = '<pre>' + s + '</pre>';
+}
+
+function formatTime(n) {
+	if (n < 10)
+		n = '0' + n;
+	return n;
+}
+
+function hideScrollbars(parent) {
+	let els = parent.querySelectorAll('*');
+	els.forEach((el) => {
+		el.style.setProperty('overflow-x', 'hidden', 'important')
+		el.style.setProperty('overflow-y', 'hidden', 'important');
+	});
+}
+
+function getString(x, lang) {
+	let text;
+	if (typeof x === 'object') {
+		if (lang === null)
+			lang = 'en';
+		text = x[lang];
+		if (text == undefined)
+			text = x['en'];
+		if (text == undefined)
+			text = '';
+	} else
+		text = x;
+	if (text instanceof String)
+		text = text.trim();
+	return text;
+}
+
+function getCssValue(name) {
+	let val = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+	if (val.startsWith("'"))
+		return val.substring(1, val.length - 1).trim();
+	if (val.startsWith('"'))
+		return val.substring(1, val.length - 1).trim();
+	return val;
+}
+
+function makeAbsoluteUrl(url) {
+	if (url.startsWith('/'))
+		url = 'file://' + url;
+	else {
+		if (window.location.protocol == 'file:')
+			return url;
+		if (!url.startsWith('https://') && !url.startsWith('http://') && !url.startsWith('wss://') && !url.startsWith('ws://') && !url.startsWith('file://')) {
+			//const port = window.location.port;
+			//return window.location.protocol + '//' + window.location.hostname + (port == '' ? '' : ":" + port) + '/' + url
+			return url;
+		}
+	}
+	return url;
+}
+	
+</script>
+
+<style type="text/css">
+@font-face {
+	font-display: block;
+	font-family: 'Roboto Condensed';
+	src: url('assets/roboto-condensed-regular.woff2') format('woff2');
+}
+
+:root {
+	--header-height: 51.2px;
+	--footer-height: 51.2px;
+	--slot-title-bar-height: 51.2px;
+	--card-title-bar-height: 51.2px;
+	--gap: 10px; /* see: JavaScript CSS_GAP */ -
+	--shadow-color: rgba(63, 63, 63, .5);
+}
+
+html, html * {
+	font-family: 'Roboto Condensed', 'sans-serif-condensed', 'sans';
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	-webkit-tap-highlight-color: transparent;
+}
+
+body {
+	overflow: hidden;
+	height: 100vh;
+	display: grid;
+	grid-template-areas: 'header' 'main' 'footer';
+	grid-template-rows: auto 1fr auto;
+}
+
+header {
+	grid-area: header;
+	height: var(--header-height);
+	box-shadow: 0 3px 5px var(--shadow-color);
+	justify-content: flex-end;
+}
+
+footer {
+	grid-area: footer;
+	height: var(--footer-height);
+	box-shadow: 0 -3px 5px var(--shadow-color);
+	justify-content: space-between;
+}
+
+main {
+	grid-area: main;
+	overflow-y: auto;
+}
+
+header, footer {
+	display: flex;
+	--margin: var(--gap);
+	padding-inline-start: var(--margin);
+	padding-inline-end: var(--margin);
+	user-select: none;
+}
+
+header .header-logo {
+	display: block;
+	height: calc( var(--header-height) - 2 * var(--margin) );
+	margin-inline-end: var(--gap);
+	margin-top: var(--margin);
+	margin-bottom: var(--margin);
+}
+
+header .header-title-wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	margin-top: .5rem;
+	margin-bottom: .4rem;
+	margin-inline-end: .5rem;
+	white-space: nowrap;
+}
+
+header .header-title {
+	font-size: 1.1rem;
+	line-height: 1.1rem;
+}
+
+header .header-status {
+	display: flex;
+	align-items: center;
+}
+
+header .header-status-text {
+	font-size: .85rem;
+}
+
+@keyframes indicator_blinker {
+	0% {
+		opacity: .4;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: .4;
+	}
+}
+
+header .header-status-indicator {
+	border-radius: 100%;
+	box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.7);
+	width: .45rem;
+	height: .45rem;
+	margin-inline-end: .25rem;
+}
+
+header .header-status-indicator-online {
+	background: var(--color-indicator-online-background);
+}
+
+header .header-status-indicator-offline {
+	background: var(--color-indicator-offline-background);
+	animation: indicator_blinker 3s ease-in infinite;
+}
+
+header .search {
+	font-size: 1rem;
+	margin-inline-end: .5rem;
+	margin-top: .5rem;
+	margin-bottom: .5rem;
+	border: none;
+	outline: none;
+	padding-inline-start: .5rem;
+	padding-inline-end: .5rem;
+}
+
+.toggle-responsice-btn {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.clock-wrapper {
+	direction: ltr;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	margin-top: .3rem;
+	margin-bottom: .45rem;
+	margin-left: auto;
+	margin-right: auto;
+	white-space: nowrap;
+}
+
+.clock-time {
+	display: flex;
+	font-size: 1.4rem;
+	font-weight: 300;
+	align-self: center;
+}
+
+.clock-date {
+	font-size: .76rem;
+	font-weight: 400;
+	align-self: center;
+}
+
+.clock-time-sep {
+	font-weight: 400;
+	animation: blinker 2s ease-in-out infinite;
+}
+
+@keyframes blinker {
+	0% {
+		opacity: 0;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+.svg-btn {
+	border: none;
+	outline: none;
+	padding-top: 5px;
+	padding-bottom: .5rem;
+	text-align: center;
+	cursor: pointer;
+	background: transparent;
+	width: 34px;
+	height: 34px;
+	border-radius: 100px;
+	margin-top: auto;
+	margin-bottom: auto;
+}
+
+.svg-btn.non-touch-device {
+	transition: .5s;
+}
+
+.lang-btn {
+	text-transform: uppercase;
+	padding-top: .55rem;
+	font-size: 1rem;
+}
+
+.spacer {
+	flex-grow: 1;
+}
+
+ul {
+	list-style: none;
+}
+
+.column__list {
+	display: flex;
+	align-items: start;
+	margin-inline-start: var(--gap);
+}
+
+.column__item {
+	padding-inline-end: var(--gap);
+}
+
+.card__list {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding-bottom: var(--gap);
+}
+
+.card {
+	height: 100%;
+}
+
+.glass-pane {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	cursor: pointer;
+}
+
+.item {
+	position: relative; /* need for glass pane */
+	height: calc(100% - var(--card-title-bar-height));
+}
+
+.item .card-content {
+	overflow-x: auto;
+	overflow-y: auto;
+}
+
+.item .card-content::-webkit-scrollbar, .item .card-content *::-webkit-scrollbar {
+	width: var(--gap);
+	height: var(--gap);
+}
+
+.item .card-content::-webkit-scrollbar-track, .item .card-content *::-webkit-scrollbar-track {
+	background-color: var(--color-card-scrollbar-track-background);
+}
+
+.item .card-content::-webkit-scrollbar-thumb:vertical, .item .card-content *::-webkit-scrollbar-thumb:vertical {
+	border-top: 1px solid var(--color-card-scrollbar-track-background);
+	background-color: var(--color-card-scrollbar-thumb-background);
+}
+
+.item .card-content::-webkit-scrollbar-thumb:horizontal, .item .card-content *::-webkit-scrollbar-thumb:horizontal {
+	border-top: 1px solid var(--color-card-scrollbar-track-background);
+	background-color: var(--color-card-scrollbar-thumb-background);
+}
+
+.card>.title-bar {
+	height: var(--card-title-bar-height);
+}
+
+.column__item>.title-bar {
+	height: var(--slot-title-bar-height);
+}
+
+.title-bar {
+	--padding: .5rem;
+	display: flex;
+	margin-top: var(--gap);
+	padding-inline-start: var(--padding);
+	padding-inline-end: var(--padding);
+	align-items: center;
+	user-select: none;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.title-bar-text-wrapper {
+	display: flex;
+	flex-grow: 1;
+	padding-inline-start: var(--padding);
+	padding-inline-end: var(--padding);
+	height: 100%;
+}
+
+.title-bar-text {
+	line-height: 100%;
+	align-self: center;
+}
+
+@media print {
+	footer, .svg-btn, .search, .search-btn {
+		display: none !important;
+	}
+	header {
+		box-shadow: none;
+		border-bottom: 1px solid #666;
+	}
+	main {
+		overflow-y: visible;
+		background: transparent;
+	}
+	.card {
+		break-inside: avoid;
+	}
+}
+
+.toggle-content {
+	display: none;
+	height: 0;
+	overflow: hidden;
+	transition: height 150ms ease-in-out;
+}
+
+.toggle-content.is-visible {
+	display: block;
+	height: auto;
+}
+
+/* ---------------------------------- colors ---------------------------------- */
+main.non-touch-device::-webkit-scrollbar {
+	width: var(--gap);
+	height: var(--gap);
+}
+
+main.non-touch-device::-webkit-scrollbar-track {
+	background: var(--color-desktop-scrollbar-track-background);
+}
+
+main.non-touch-device::-webkit-scrollbar-corner {
+	background: var(--color-desktop-background);
+}
+
+main.non-touch-device::-webkit-scrollbar-thumb:vertical {
+	border-top: 1px solid var(--color-desktop-scrollbar-track-background);
+	border-bottom: 1px solid var(--color-desktop-scrollbar-track-background);
+	background: var(--color-desktop-scrollbar-thumb-background);
+}
+
+main.non-touch-device::-webkit-scrollbar-thumb:horizontal {
+	background: var(--color-header-background);
+}
+
+mark {
+	color: var(--color-mark-foreground);
+	background: var(--color-mark-background);
+}
+
+::selection {
+	color: var(--color-selection-foreground);
+	background: var(--color-selection-background);
+}
+
+header {
+	background: linear-gradient(to right, var(--color-header-side-background), var(--color-header-background), var(--color-header-side-background));
+}
+
+footer {
+	background: linear-gradient(to right, var(--color-footer-side-background), var(--color-footer-background), var(--color-footer-side-background));
+}
+
+main {
+	background: var(--color-desktop-background);
+}
+
+header .header-title-wrapper {
+	color: var(--color-header-text-foreground);
+}
+
+.clock-wrapper {
+	color: var(--color-header-clock-separator-foreground);
+}
+
+.clock-time-sep {
+	color: var(--color-header-clock-separator-foreground);
+}
+
+header .svg-btn path {
+	fill: var(--color-header-button-foreground);
+}
+
+header .svg-btn text {
+	fill: var(--color-header-button-foreground);
+}
+
+footer .svg-btn path {
+	fill: var(--color-footer-button-foreground);
+}
+
+.svg-btn.non-touch-device:hover path, .svg-btn.non-touch-device:hover text {
+	fill: rgba(256, 256, 256, 1) !important;
+}
+
+.svg-btn.non-touch-device:hover {
+	background: rgba(256, 256, 256, .5);
+	color: rgba(0, 0, 0, 1) !important;
+}
+
+.item {
+	background: var(--color-card-content-background);
+}
+
+.card .title-bar {
+	background: linear-gradient(to right, var(--color-card-title-bar-background), var(--color-card-title-bar-side-background)) !important;
+	color: var(--color-card-title-bar-text-foreground) !important;
+}
+
+.card .title-bar:hover {
+	background: var(--color-card-title-bar-background) !important;
+}
+
+.card>.title-bar>.svg-btn path {
+	fill: var(--color-card-title-bar-button-foreground);
+}
+
+.column__item>.title-bar {
+	background: var(--color-slot-title-bar-background);
+}
+
+.column__item .title-bar {
+	color: var(--color-slot-title-bar-text-foreground);
+}
+
+.column__item>.title-bar>.svg-btn path {
+	fill: var(--color-slot-title-bar-button-foreground);
+}
+</style>
+</head>
+<body translate="no"></body>
+<script type="text/javascript">
+'use strict';
+
+function printInfo() {
+	let href = window.location.href;
+	let dir = href.substring(0, href.lastIndexOf('/'));
+	//
+	let arr = [];
+	for (let p of URL_PARAMS)
+		arr.push({Name: p[0], Value: p[1]});
+	//
+	var styles = [
+    'background: linear-gradient(to right, #007a7a, #51f1e3, #007a7a)'
+    , 'color: white'
+    , 'text-shadow: 0 2px 0 rgba(0, 0, 0, 0.7)'
+    , 'line-height: 3rem'
+    , 'text-align: center'
+    , 'font-weight: bold'
+    , 'font-size: 2rem'
+    , 'padding-left: 1rem'
+    , 'padding-right: 1rem'
+].join(';');
+	console.log('%cNĖURO', styles);
+	//
+	console.group('%cContacts and support:', 'color: #007a7a;');
+	console.info('Home: https://neuro-lab.github.io');
+	console.info('E-Mail: neuro.lab.team@gmail.com');
+	console.groupEnd();
+	//
+	console.group('%cFiles:', 'color: #007a7a;');
+	console.info('Theme:          ' + dir + '/theme.css');
+	console.info('Config:         ' + dir + '/config.js');
+	console.info('Service worker: ' + dir + '/sw.js');
+	console.groupEnd();
+	//
+	console.group('%cURL Parameters:', 'color: #007a7a;');
+	if (arr.length == 0)
+		console.log('No URL parameters provided');
+	else
+		console.table(arr);
+	console.groupEnd();
+
+}
+
+function configAsString() {
+	return JSON.stringify(sys_properties) + //
+	JSON.stringify(sys_resources) + //
+	JSON.stringify(sys_eventHandler) + //
+	JSON.stringify(sys_eventProviders) + //
+	JSON.stringify(sys_groups);
+}
+
+/*
+ * TODO - save in localStorage open/closed statuses of slots/cards
+ * https://jsfiddle.net/cferdinandi/qgpxvhhb/18/
+ * https://gomakethings.com/how-to-add-transition-animations-to-vanilla-javascript-show-and-hide-methods/
+ */
+//
+//
+const ICON_STAR_OFF = '<svg width="24" height="24"><path d="M12,15.39L8.24,17.66L9.23,13.38L5.91,10.5L10.29,10.13L12,6.09L13.71,10.13L18.09,10.5L14.77,13.38L15.76,17.66M22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.45,13.97L5.82,21L12,17.27L18.18,21L16.54,13.97L22,9.24Z"/></svg>';
+const ICON_STAR_ON = '<svg width="24" height="24"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/></svg>';
+const ICON_STAR_HALF = '<svg width="24" height="24"><path d="M12,15.4V6.1L13.71,10.13L18.09,10.5L14.77,13.39L15.76,17.67M22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.45,13.97L5.82,21L12,17.27L18.18,21L16.54,13.97L22,9.24Z"/></svg>';
+//
+const ICON_SWAP_VERTICAL = '<svg width="24" height="24"><path d="M14,8H11V14H6V8H3L8.5,2L14,8M15.5,22L21,16H18V10H13V16H10L15.5,22Z"/></svg>';
+const ICON_SWAP_HORIZONTAL = '<svg width="24" height="24"><path d="M8,10V13H14V18H8V21L2,15.5L8,10M22,8.5L16,3V6H10V11H16V14L22,8.5Z"/></svg>';
+//
+const ICON_ARROWS_PREV_HORIZONTAL = '<svg width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>';
+const ICON_ARROWS_NEXT_HORIZONTAL = '<svg width="24" height="24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>';
+//
+const ICON_ARROWS_PREV_VERTICAL = '<svg width="24" height="24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>';
+const ICON_ARROWS_NEXT_VERTICAL = '<svg width="24" height="24"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>';
+//
+//const ICON_ARROW_TOP = '<svg width="24" height="24"><path d="M4.08,11.92L12,4L19.92,11.92L18.5,13.33L13,7.83V22H11V7.83L5.5,13.33L4.08,11.92M12,4H22V2H2V4H12Z"/></svg>';
+//const ICON_ARROW_BOTTOM = '<svg width="24" height="24"><path d="M19.92,12.08L12,20L4.08,12.08L5.5,10.67L11,16.17V2H13V16.17L18.5,10.66L19.92,12.08M12,20H2V22H22V20H12Z"/></svg>';
+
+//const ICON_MENU_1 = '<svg width="24" height="24"><path d="M3,16H21V18H3V16Z"/></svg>';
+const ICON_MENU_2 = '<svg width="24" height="24"><path d="M3,11H21V13H3V11M3,16H21V18H3V16Z"/></svg>';
+const ICON_MENU_3 = '<svg width="24" height="24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/></svg>';
+//
+const ICON_MOVE_UP = '<svg width="24" height="24"><path d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"/></svg>';
+const ICON_CLOSE = '<svg width="24" height="24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>';
+const ICON_SEARCH = '<svg width="24" height="24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>';
+//
+const ICON_1 = '<svg width="24" height="24"><path d="M21,17H7V3H21M21,1H7A2,2 0 0,0 5,3V17A2,2 0 0,0 7,19H21A2,2 0 0,0 23,17V3A2,2 0 0,0 21,1M14,15H16V5H12V7H14M3,5H1V21A2,2 0 0,0 3,23H19V21H3V5Z"/></svg>';
+const ICON_2 = '<svg width="24" height="24"><path d="M17,13H13V11H15A2,2 0 0,0 17,9V7C17,5.89 16.1,5 15,5H11V7H15V9H13A2,2 0 0,0 11,11V15H17M21,17H7V3H21M21,1H7A2,2 0 0,0 5,3V17A2,2 0 0,0 7,19H21A2,2 0 0,0 23,17V3A2,2 0 0,0 21,1M3,5H1V21A2,2 0 0,0 3,23H19V21H3V5Z"/></svg>';
+const ICON_3 = '<svg width="24" height="24"><path d="M17,13V11.5A1.5,1.5 0 0,0 15.5,10A1.5,1.5 0 0,0 17,8.5V7C17,5.89 16.1,5 15,5H11V7H15V9H13V11H15V13H11V15H15A2,2 0 0,0 17,13M3,5H1V21A2,2 0 0,0 3,23H19V21H3M21,17H7V3H21M21,1H7A2,2 0 0,0 5,3V17A2,2 0 0,0 7,19H21A2,2 0 0,0 23,17V3A2,2 0 0,0 21,1Z"/></svg>';
+
+//
+const CSS_GAP = 10;
+//
+const BOOKMARK_STATE_ON = +1;
+const BOOKMARK_STATE_OFF = -1;
+const BOOKMARK_STATE_BOTH = 0;
+//
+const COLLAPSE_STATE_NONE = 0;
+//const COLLAPSE_STATE_SLOTS = 1;
+const COLLAPSE_STATE_CARDS = 2;
+//
+const TOUCH_DEVICE = 'ontouchstart' in window;
+const IFRAME = window.self !== window.top;
+//
+const URL_PARAMS = new URLSearchParams(window.location.search);
+//
+function rtlByLang(lang) {
+	return lang == 'ar' || lang == 'he';
+}
+function arrowPrevHorizontal(rtl) {
+	return rtl ? ICON_ARROWS_NEXT_HORIZONTAL : ICON_ARROWS_PREV_HORIZONTAL;
+}
+
+function arrowNextHorizontal(rtl) {
+	return rtl ? ICON_ARROWS_PREV_HORIZONTAL : ICON_ARROWS_NEXT_HORIZONTAL;
+}
+
+class DefaultCardUi {
+
+	onAttach(parent, lang) {
+		this.wrapperEl = document.createElement('div');
+		this.wrapperEl.style.display = 'flex';
+		this.wrapperEl.style.flexDirection = 'column-reverse';
+		parent.style.overflowY = 'auto';
+		parent.appendChild(this.wrapperEl);
+	}
+
+	onEvent(parent, obj, eventName, data, lang) {
+		this.wrapperEl.textContent = eventName + ' ' + data;
+	}
+}
+
+//
+class Card {
+	constructor() {
+		const t = this;
+		this.serialNo = -1;
+		this.slot = null;
+		//
+		this.title = '';
+		//
+		this.tags = [];
+		this.events = undefined;
+		//
+		this.obj = null;
+		this.ui = null;
+		//
+		this.minimized = false;
+		this.maximized = false;
+		//
+		this.minimizable = true;
+		this.maximizable = true;
+		//
+		this.titleBarVisible = true;
+		//
+		this.savedHeight = null;
+		//
+		this.clickCount = 0;
+		this.singleClickTimer = null;
+		//
+		this.savedIndex = -1;
+		//
+		this.cardEl = document.createElement('div');
+		this.cardEl.classList.add('card');
+		//
+		this.cardHeaderEl = document.createElement('div');
+		this.cardHeaderEl.addEventListener('click', (e) => {
+			t.clickCount++;
+			if (t.clickCount === 1) {
+				t.singleClickTimer = setTimeout(function(){
+					t.clickCount = 0;
+					if (t.minimized)
+						t.toggleMinimize();
+					else
+						t.toggleMaximize();
+					}, 400);
+			} else if (t.clickCount === 2) {
+				clearTimeout(t.singleClickTimer);
+				t.clickCount = 0;
+				if (t.minimized)
+					t.toggleMinimize();
+				else {
+					if (document.fullscreenElement == null) {
+						if (!t.maximized)
+							t.toggleMaximize();
+						document.documentElement.requestFullscreen();
+					} else
+						document.exitFullscreen();
+				}
+			}
+		});
+		this.cardHeaderEl.classList.add('title-bar');
+		this.cardEl.appendChild(this.cardHeaderEl);
+		//
+		this.cardBackEl = document.createElement('div');
+		this.cardBackEl.classList.add('svg-btn');
+		this.cardBackEl.style.display = 'none';
+		this.cardHeaderEl.appendChild(this.cardBackEl);
+		//
+		this.cardMinimizeEl = document.createElement('div');
+		this.cardMinimizeEl.innerHTML = ICON_ARROWS_NEXT_VERTICAL;
+		this.cardMinimizeEl.classList.add('svg-btn');
+		this.cardMinimizeEl.addEventListener('click', (e) => {
+			e.stopPropagation();
+			if (t.minimizable)
+				t.toggleMinimize();
+		});
+		this.cardHeaderEl.appendChild(this.cardMinimizeEl);
+		//
+		this.titleBarTextWrapper = document.createElement('div');
+		this.titleBarTextWrapper.classList.add('title-bar-text-wrapper');
+		this.cardHeaderEl.appendChild(this.titleBarTextWrapper);
+
+		this.cardTitileEl = document.createElement('div');
+		this.cardTitileEl.classList.add('title-bar-text');
+		this.titleBarTextWrapper.appendChild(this.cardTitileEl);
+		//
+		this.cardBookmarkEl = document.createElement('div');
+		this.cardBookmarkEl.innerHTML = ICON_STAR_OFF;
+		this.cardBookmarkEl.classList.add('svg-btn');
+		this.cardBookmarkEl.addEventListener('click', (e) => {
+			e.stopPropagation();
+			let bookmark = t.isBookmark();
+			bookmark = !bookmark;
+			if (bookmark)
+				localStorage.setItem('bookmark.' + t.slot.serialNo + ':' + t.serialNo, '*');
+			else
+				localStorage.removeItem('bookmark.' + t.slot.serialNo + ':' + t.serialNo);
+			t.manageBookmark(bookmark);
+			Dashboard.processSlots(t.slot.dashboard);
+		});
+		this.cardHeaderEl.appendChild(this.cardBookmarkEl);
+		//
+		this.cardMaximizeEl = document.createElement('div');
+		this.cardMaximizeEl.innerHTML = ICON_MOVE_UP;
+		this.cardMaximizeEl.classList.add('svg-btn');
+		this.cardMaximizeEl.addEventListener('click', (e) => {
+			if (t.maximized || t.minimized)
+				return;
+			e.stopPropagation();
+			t.cardEl.style.paddingTop = 'calc( var(--gap) / 2 )';
+			t.cardEl.scrollIntoView({
+				behavior: 'smooth',
+				block: 'start'
+			});
+			t.cardEl.style.paddingTop = '0';
+		});
+		this.cardHeaderEl.appendChild(this.cardMaximizeEl);
+		//
+		this.cardContentEl = document.createElement('div');
+		this.cardContentEl.classList.add('item', 'toggle-content', 'is-visible');
+		this.cardEl.appendChild(this.cardContentEl);
+	}
+
+	addGlassPane() {
+		const t = this;
+		t.glassPaneEl = document.createElement('div');
+		t.glassPaneEl.classList.add('glass-pane');
+		t.glassPaneEl.addEventListener('click', (e) => {
+			e.preventDefault();
+			t.clickCount++;
+			if (t.clickCount === 1) {
+				t.singleClickTimer = setTimeout(function(){
+					t.clickCount = 0;
+					t.toggleMaximize();
+				}, 400);
+			} else if (t.clickCount === 2) {
+				clearTimeout(t.singleClickTimer);
+				t.clickCount = 0;
+				if (document.fullscreenElement == null) {
+					if (!t.maximized)
+						t.toggleMaximize();
+					document.documentElement.requestFullscreen();
+				} else
+					document.exitFullscreen();
+			}
+		});
+		this.cardContentEl.appendChild(t.glassPaneEl);
+	}
+
+	isBookmark() {
+		return localStorage.getItem('bookmark.' + this.slot.serialNo + ':' + this.serialNo) !== null;
+	}
+
+	manageBookmark(bookmark) {
+		this.cardBookmarkEl.innerHTML = bookmark ? ICON_STAR_ON : ICON_STAR_OFF;
+	}
+
+	getIndex() {
+		return [...this.cardEl.parentElement.children].indexOf(this.cardEl);
+	}
+
+	minimize(b) {
+		this.minimized = b;
+		//
+		if (this.minimized) {
+			this.cardMinimizeEl.innerHTML = arrowNextHorizontal(this.slot.dashboard.rtl);
+			Dashboard.hide(this.cardContentEl);
+			this.cardMaximizeEl.style.display = 'none';
+			if (this.slot.titleBarVisible || this.getIndex() != 0)
+				this.cardHeaderEl.style.marginTop = '0';
+			this.cardHeaderEl.style.background = 'var(--color-card-title-bar-background)';
+		} else {
+			this.cardMinimizeEl.innerHTML = ICON_ARROWS_NEXT_VERTICAL
+			Dashboard.show(this.cardContentEl);
+			this.cardMaximizeEl.style.display = 'block';
+			this.cardHeaderEl.style.marginTop = 'var(--gap)';
+			this.cardHeaderEl.style.background = 'linear-gradient(to right, var(--color-card-title-bar-background), transparent)';
+		}
+		for (let i = 0; i < this.slot.cards.length; i++) {
+			if (this.slot.cards[i].minimized && (i != this.slot.cards.length - 1 && this.slot.cards[i + 1].minimized))
+				this.slot.cards[i].cardHeaderEl.style.borderBottom = '1px solid var(--color-desktop-background)';
+			else
+				this.slot.cards[i].cardHeaderEl.style.borderBottom = 'none';
+			//
+			if (!this.slot.cards[i].minimized && (i != this.slot.cards.length - 1 && this.slot.cards[i + 1].minimized))
+				this.slot.cards[i].cardEl.style.marginBottom = 'var(--gap)';
+			else
+				this.slot.cards[i].cardEl.style.marginBottom = '';
+		}
+		this.resizeHandler();
+	}
+
+	toggleMinimize() {
+		this.minimize(!this.minimized);
+	}
+
+	toggleMaximize() {
+		this.maximized = !this.maximized;
+		//
+		let d = this.slot.dashboard;
+		let p = this.slot.cardListEl;
+		//
+		let interactive;
+		if (this.ui.isInteractive == undefined)
+			interactive = true;
+		else
+			interactive = this.ui.isInteractive(this.maximized);
+		this.glassPaneEl.hidden = interactive;
+		//
+		if (this.maximized) {
+			this.savedHeight = this.cardContentEl.getBoundingClientRect().height + 'px';
+			this.savedHeightFirstChild = this.cardContentEl.firstChild.getBoundingClientRect().height + 'px';
+			//
+			this.slot.dashboard.exclusiveCardId = null;
+			//
+			d.headerEl.style.display = 'none';
+			d.mainEl.style.display = 'none';
+			//
+			this.savedIndex = this.getIndex();
+			document.body.style.background = 'var(--color-desktop-background)';
+			p.removeChild(this.cardEl);
+			document.body.appendChild(this.cardEl);
+
+			document.body.style.display = 'flex';
+			this.cardHeaderEl.style.marginTop = '0';
+			this.cardEl.style.width = '100%';
+			this.cardEl.style.minHeight = 'auto';
+			this.cardContentEl.style.minHeight = 'calc( 100% - var(--card-title-bar-height) )';
+			this.cardContentEl.style.height = 'calc( 100% - var(--card-title-bar-height) )';
+			this.cardContentEl.firstChild.style.height = 'calc( 100% - 2 * var(--gap) )';
+			this.cardMaximizeEl.innerHTML = ICON_CLOSE;
+			this.titleBarTextWrapper.style.justifyContent = 'space-around';
+			//
+			this.cardBackEl.style.display = 'block';
+			if (this.minimizable)
+				this.cardMinimizeEl.style.display = 'none';
+			//
+			d.setFooterVisible(false);
+		} else {
+			d.headerEl.style.display = 'flex';
+			d.mainEl.style.display = 'block';
+			//
+			document.body.style.background = '';
+			document.body.removeChild(this.cardEl);
+			p.insertBefore(this.cardEl, p.children[this.savedIndex]);
+			//
+			document.body.style.display = 'grid';
+			this.cardHeaderEl.style.marginTop = 'var(--gap)';
+			this.cardEl.style.width = '';
+			this.cardEl.style.minHeight = '';
+			this.cardContentEl.style.minHeight = '';
+			this.cardContentEl.style.height = this.savedHeight;
+			this.cardContentEl.firstChild.style.height = this.savedHeightFirstChild;
+			this.cardMaximizeEl.innerHTML = ICON_MOVE_UP;
+			this.titleBarTextWrapper.style.justifyContent = '';
+			//
+			this.cardBackEl.style.display = 'none';
+			if (this.minimizable)
+				this.cardMinimizeEl.style.display = 'block';
+			/*
+			 * Need after exit from exclusive mode to repaint other cards in
+			 * multi-threading environment
+			 */
+			this.slot.dashboard.resizeAllCards();
+			//
+			d.setFooterVisible(true);
+		}
+		this.resizeHandler();
+	}
+
+	resizeHandler() {
+		if (this.ui.onResize != undefined)
+			this.ui.onResize(this.cardContentEl.firstChild, this.obj);
+	}
+
+	getContent() {
+		return this.cardContentEl.firstChild;
+	}
+
+	setTags(tags) {
+		this.tags = tags;
+	}
+
+	setTitle(title) {
+		this.title = title;
+		this.cardTitileEl.innerHTML = title;
+	}
+
+	hideTitleBar() {
+		this.titleBarVisible = false;
+		this.cardHeaderEl.style.display = 'none';
+		this.cardEl.style.marginTop = 'var(--gap)';
+	}
+
+	setMinimizable(b) {
+		this.minimizable = b;
+		this.cardMinimizeEl.style.display = b ? 'block' : 'none';
+	}
+
+	setMaximizable(b) {
+		this.maximizable = b;
+		this.cardMaximizeEl.style.display = b ? 'block' : 'none';
+	}
+}
+
+class Slot {
+	constructor(width) {
+		const t = this;
+		this.serialNoCounter = -1;
+		this.serialNo = -1;
+		this.dashboard = null;
+		//
+		this.title = '';
+		//
+		this.width = width;
+		//
+		this.minimized = false;
+		//
+		this.minimizable = true;
+		//
+		this.titleBarVisible = true;
+		//
+		this.cards = [];
+		this.columnItem = document.createElement('li');
+		this.slotHeaderEl = document.createElement('div');
+		this.slotHeaderEl.classList.add('title-bar');
+		this.titleBarTextWrapper = document.createElement('div');
+		this.titleBarTextWrapper.classList.add('title-bar-text-wrapper');
+		this.h2 = document.createElement('div');
+		this.titleBarTextWrapper.appendChild(this.h2);
+		this.h2.classList.add('title-bar-text');
+		this.slotMinimizeEl = document.createElement('div');
+		this.slotMinimizeEl.classList.add('svg-btn');
+		this.slotHeaderEl.addEventListener('click', (e) => {
+			e.stopPropagation();
+			if (t.minimizable)
+				t.toggleMinimize();
+		});
+		this.slotSlideUpEl = document.createElement('div');
+		this.slotSlideUpEl.classList.add('svg-btn');
+		this.slotSlideUpEl.innerHTML = ICON_MOVE_UP;
+		this.slotSlideUpEl.addEventListener('click', (e) => {
+			e.stopPropagation();
+			t.columnItem.scrollIntoView({
+				behavior: 'smooth',
+				block: 'start'
+			});
+		});
+		this.cardListEl = document.createElement('ul');
+		//
+		this.columnItem.classList.add('column__item');
+		this.columnItem.style.width = this.width + 'px';
+		this.columnItem.style.minWidth = this.width + 'px';
+		//
+		this.columnItem.appendChild(this.slotHeaderEl);
+		//
+		this.slotMinimizeEl.innerHTML = ICON_ARROWS_NEXT_VERTICAL;
+		this.slotMinimizeEl.addEventListener('click', (e) => {
+			e.stopPropagation();
+			if (t.minimizable)
+				t.toggleMinimize();
+		});
+		this.slotHeaderEl.appendChild(this.slotMinimizeEl);
+		//
+		this.slotHeaderEl.appendChild(this.titleBarTextWrapper);
+		//
+		this.slotHeaderEl.appendChild(this.slotSlideUpEl);
+		//
+		this.cardListEl.classList.add('card__list', 'toggle-content', 'is-visible');
+		this.columnItem.appendChild(this.cardListEl);
+	}
+
+	setTitle(title) {
+		this.title = title;
+		this.h2.innerHTML = title;
+	}
+
+	hideTitleBar() {
+		this.titleBarVisible = false;
+		this.slotHeaderEl.style.display = 'none';
+		this.slotHeaderEl.style.margin = 'calc( -1 * var(--gap) )';
+	}
+
+	addCard(card) {
+		card.serialNo = ++this.serialNoCounter;
+		card.slot = this;
+		this.cards.push(card);
+		this.cardListEl.append(card.cardEl);
+	}
+
+	removeCard(card) {
+		const index = this.cards.findIndex(function(curCard) {
+			return card.serialNo == curCard.serialNo;
+		});
+		this.cards.splice(index, 1);
+		const cardEl = card.cardEl;
+		cardEl.parentNode.removeChild(cardEl);
+	}
+
+	getIndex() {
+		return [...this.columnItem.parentElement.children].indexOf(this.columnItem);
+	}
+
+	setMinimizable(b) {
+		this.minimizable = b;
+		this.slotMinimizeEl.style.display = b ? 'block' : 'none';
+		this.slotHeaderEl.style.cursor = b ? 'pointer' : 'default';
+	}
+
+	minimize(b) {
+		this.minimized = b;
+		//
+		if (this.minimized) {
+			this.cardListEl.style.display = 'none';
+			this.slotMinimizeEl.innerHTML = arrowNextHorizontal(this.dashboard.rtl);
+		} else {
+			this.cardListEl.style.display = 'block';
+			this.slotMinimizeEl.innerHTML = ICON_ARROWS_NEXT_VERTICAL;
+			this.cards.forEach((card) => {
+				card.resizeHandler();
+			});
+		}
+		//
+		this.dashboard.manageGapsAndBorders();
+		for (let i = 0; i < this.dashboard.slots.length; i++)
+			if (!this.dashboard.slots[i].minimized && i != this.dashboard.slots.length - 1)
+				this.dashboard.slots[i + 1].slotHeaderEl.style.marginTop = 'var(--gap)';
+	}
+
+	toggleMinimize() {
+		this.minimize(!this.minimized);
+	}
+}
+
+class Dashboard {
+	constructor(lang, langs) {
+		const t = this;
+		//
+		this.serialNoCounter = -1;
+		this.slots = [];
+		this.wrap = false;
+		//
+		this.lang = lang;
+		this.langs = langs;
+		//
+		this.rtl = rtlByLang(lang);
+		//
+		this.oneColumn = false;
+		this.smartphone = false;
+		this.collapseState = COLLAPSE_STATE_NONE;
+		//
+		this.stand_by_timeout_ms = null;
+		//
+		this.tags = [];
+		//
+		this.savedSearchHidden;
+		this.savedSearchBtnHidden;
+		//
+		this.searchDashboard = '';
+		//
+		this.sleepTemeout = null;
+		//
+		this.footer = true;
+		//
+		this.debug = false;
+		//
+		this.eventsCount = 0;
+		//
+		this.bookmarkState = BOOKMARK_STATE_ON;
+		//
+		this.exclusiveCardId = null;
+		//
+		this.showBookmarked = true;
+		this.showNonBookmarked = true;
+		//
+		this.headerEl = document.createElement('header');
+		this.footerEl = document.createElement('footer');
+		this.mainEl = document.createElement('main');
+		//
+		this.logoEl = document.createElement('img');
+		this.logoEl.classList.add('header-logo');
+		this.headerEl.appendChild(this.logoEl);
+		//
+		this.scrollLeft0 = 0;
+		this.scrollTop0 = 0;
+		//
+		this.scrollLeft1 = 0;
+		this.scrollTop1 = 0;
+		//
+		this.titleWrapperEl = document.createElement('div');
+		this.titleWrapperEl.classList.add('header-title-wrapper');
+		this.clickCount = 0;
+		this.singleClickTimer = null;
+		//
+		this.headerEl.appendChild(this.titleWrapperEl);
+		//
+		this.titleEl = document.createElement('div');
+		this.titleEl.classList.add('header-title');
+		this.titleWrapperEl.appendChild(this.titleEl);
+		//
+		this.statusEl = document.createElement('div');
+		this.statusEl.classList.add('header-status');
+		this.titleWrapperEl.appendChild(this.statusEl);
+		//
+		this.statusIconEl = document.createElement('div');
+		this.statusIconEl.classList.add('header-status-indicator');
+		this.statusEl.appendChild(this.statusIconEl);
+		//
+		this.statusTextEl = document.createElement('div');
+		this.statusTextEl.classList.add('header-status-text');
+		this.statusEl.appendChild(this.statusTextEl);
+		//
+		this.spacerEl = document.createElement('div');
+		this.spacerEl.classList.add('spacer');
+		this.spacerEl.addEventListener('click', function(e) {
+            t.clickCount++;
+            if (t.clickCount === 1) {
+                t.singleClickTimer = setTimeout(function(){
+                    t.clickCount = 0;
+                }, 400);
+            } else if (t.clickCount === 2) {
+                clearTimeout(t.singleClickTimer);
+                t.clickCount = 0;
+    			if (document.fullscreenElement == null)
+    				document.documentElement.requestFullscreen();
+    			else
+    				document.exitFullscreen();
+            }
+        }, false);
+
+		this.headerEl.appendChild(this.spacerEl);
+		//
+		this.searchEl = document.createElement('input');
+		this.searchEl.addEventListener('input', (e) => {
+			t.searchDashboard = t.searchEl.value;
+			Dashboard.processSlots(t);
+		});
+		//
+		this.searchEl.setAttribute('type', 'search');
+		this.searchEl.setAttribute('autocomplete', 'off');
+		this.searchEl.setAttribute('autocorrect', 'off');
+		this.searchEl.setAttribute('autocapitalize', 'off');
+		this.searchEl.setAttribute('spellcheck', 'false');
+		this.searchEl.classList.add('search');
+		this.searchEl.hidden = true;
+		this.headerEl.appendChild(this.searchEl);
+		//
+		this.searchBtnEl = document.createElement('div');
+		this.searchBtnEl.classList.add('svg-btn', 'search-btn');
+		this.searchBtnEl.innerHTML = ICON_SEARCH;
+		this.searchBtnEl.hidden = true;
+		this.searchBtnEl.addEventListener('click', (e) => {
+			if (t.searchEl.hidden) {
+				t.displayBrand(false);
+				t.searchEl.hidden = false;
+				if (document.fullscreenElement != null)
+					document.exitFullscreen();
+				t.searchEl.focus();
+			} else {
+				t.displayBrand(true);
+				t.searchEl.blur();
+				t.searchEl.hidden = true;
+			}
+		});
+		this.headerEl.appendChild(this.searchBtnEl);
+		//
+		this.showBookmarksBtnEl = document.createElement('button');
+		this.showBookmarksBtnEl.classList.add('svg-btn', 'show-bookmarks-btn');
+		this.showBookmarksBtnEl.title = 'Show Bookmarked';
+		this.showBookmarksBtnEl.innerHTML = ICON_STAR_HALF;
+		this.showBookmarksBtnEl.onclick = function(e) {
+			if (t.bookmarkState == BOOKMARK_STATE_BOTH) {
+				t.showBookmarked = true;
+				t.showNonBookmarked = true;
+				t.bookmarkState = BOOKMARK_STATE_ON;
+			} else if (t.bookmarkState == BOOKMARK_STATE_ON) {
+				t.showBookmarked = true;
+				t.showNonBookmarked = false;
+				t.bookmarkState = BOOKMARK_STATE_OFF;
+			} else if (t.bookmarkState == BOOKMARK_STATE_OFF) {
+				t.showBookmarked = false;
+				t.showNonBookmarked = true;
+				t.bookmarkState = BOOKMARK_STATE_BOTH;
+			}
+			Dashboard.processSlots(t);
+		};
+		this.headerEl.appendChild(this.showBookmarksBtnEl);
+		//
+		this.collapseBtnEl = document.createElement('div');
+		this.collapseBtnEl.classList.add('svg-btn');
+		this.collapseBtnEl.innerHTML = ICON_MENU_3;
+		this.collapseBtnEl.onclick = function(e) {
+			if (t.collapseState == COLLAPSE_STATE_NONE) { // 3
+				t.collapseBtnEl.innerHTML = ICON_MENU_2;
+				t.collapseState = COLLAPSE_STATE_CARDS;
+			} else if (t.collapseState == COLLAPSE_STATE_CARDS) { // 2
+					t.collapseBtnEl.innerHTML = ICON_MENU_3;
+					t.collapseState = COLLAPSE_STATE_NONE;
+			}
+			t.slots.forEach((slot) => {
+				if (slot.titleBarVisible && slot.minimizable)
+					slot.minimize(false);
+				if (t.collapseState == COLLAPSE_STATE_CARDS) {
+					slot.cards.forEach((card) => {
+						if (card.titleBarVisible && card.minimizable) {
+							if (card.slot.dashboard.exclusiveCardId != card.slot.serialNo + ':' + card.serialNo)
+								card.minimize(true);
+							if (t.collapseState == COLLAPSE_STATE_NONE)
+								card.resizeHandler();
+						}
+					});
+				} else if (t.collapseState == COLLAPSE_STATE_NONE) {
+					slot.cards.forEach((card) => {
+						if (card.titleBarVisible && card.minimizable) {
+							card.minimize(false);
+							if (t.collapseState == COLLAPSE_STATE_NONE)
+								card.resizeHandler();
+						}
+					});
+				}
+
+			});
+		};
+		this.headerEl.appendChild(this.collapseBtnEl);
+		//
+		this.swithLangBtnEl = document.createElement('div');
+		this.swithLangBtnEl.classList.add('svg-btn');
+		this.swithLangBtnEl.addEventListener('click', (e) => {
+			let n = t.langs.indexOf(t.lang);
+			if (n == t.langs.length - 1)
+				n = 0;
+			else
+				n++;
+			//
+			t.lang = t.langs[n];
+			//
+			t.manageLang();
+		});
+		this.swithLangBtnEl.hidden = this.langs.length == 1;
+		this.headerEl.appendChild(this.swithLangBtnEl);
+		//
+		this.scrollToStartBtnEl = document.createElement('div');
+		this.scrollToStartBtnEl.classList.add('svg-btn');
+		this.footerEl.appendChild(this.scrollToStartBtnEl);
+		this.scrollToStartBtnEl.onclick = function(e) {
+			let n = -1;
+			for (let i = 0; i < t.slots.length; i++) {
+				let el = t.slots[i].columnItem;
+				let r = el.getBoundingClientRect();
+				if (!t.rtl && r.left >= CSS_GAP) {
+					n = i - 1;
+					break;
+				} else if (t.rtl && r.left <= CSS_GAP) {
+					n = i - 1;
+					break;
+ 				}
+			}
+			if (n != -1 && n < t.slots.length)
+				t.slots[n].columnItem.scrollIntoView({
+					behavior: 'smooth',
+					inline: t.rtl ? 'start' : 'end'
+				});
+		};
+		//
+		this.goToStartBtnEl = document.createElement('div');
+		this.goToStartBtnEl.classList.add('svg-btn');
+		this.goToStartBtnEl.innerHTML = ICON_ARROWS_PREV_VERTICAL;
+		this.footerEl.appendChild(this.goToStartBtnEl);
+		this.goToStartBtnEl.onclick = function(e) {
+			let n = -1;
+			for (let i = 0; i < t.slots.length; i++) {
+				let el = t.slots[i].columnItem;
+				let r = el.getBoundingClientRect();
+				if (r.top >= HEADER_HEIGHT - 1) {
+					n = i - 1;
+					break;
+				} else
+					n = i;
+			}
+			if (n != -1 && n < t.slots.length)
+				t.slots[n].columnItem.scrollIntoView({
+					behavior: 'smooth',
+					block: 'start'
+				});
+		};
+		//
+		this.toggleResponsiveBtnEl = document.createElement('div');
+		this.toggleResponsiveBtnEl.classList.add('svg-btn', 'toggle-responsice-btn');
+		t.footerEl.appendChild(this.toggleResponsiveBtnEl);
+		t.toggleResponsiveBtnEl.onclick = function(e) {
+			t.wrap = !t.wrap;
+			//
+			t.setWrap(t.wrap);
+			t.resizeAllCards();
+			t.oneColumn = Dashboard.isOneColumn(t.slots);
+			t.manageFooterButtons();
+			t.manageGapsAndBorders();
+		};
+		//
+		this.clockWrapperEl = document.createElement('div');
+		this.clockWrapperEl.classList.add('clock-wrapper');
+		this.clockWrapperEl.style.display = 'none';
+		this.footerEl.appendChild(this.clockWrapperEl);
+		//
+		this.clockTimeEl = document.createElement('div');
+		this.clockTimeEl.classList.add('clock-time');
+		this.clockWrapperEl.appendChild(this.clockTimeEl);
+		//
+		this.clockTimeHhEl = document.createElement('div');
+		this.clockTimeEl.appendChild(this.clockTimeHhEl);
+		//
+		this.clockTimeSepEl1 = document.createElement('div');
+		this.clockTimeSepEl1.classList.add('clock-time-sep');
+		this.clockTimeEl.appendChild(this.clockTimeSepEl1);
+		//
+		this.clockTimeMmEl = document.createElement('div');
+		this.clockTimeEl.appendChild(this.clockTimeMmEl);
+		//
+		this.clockTimeSepEl2 = document.createElement('div');
+		this.clockTimeSepEl2.classList.add('clock-time-sep');
+		this.clockTimeEl.appendChild(this.clockTimeSepEl2);
+		//
+		this.clockTimeSsEl = document.createElement('div');
+		this.clockTimeEl.appendChild(this.clockTimeSsEl);
+		//
+		this.clockDateEl = document.createElement('div');
+		this.clockDateEl.classList.add('clock-date');
+		this.clockWrapperEl.appendChild(this.clockDateEl);
+		//
+		this.scrollToEndBtnEl = document.createElement('div');
+		this.scrollToEndBtnEl.classList.add('svg-btn');
+		this.footerEl.appendChild(this.scrollToEndBtnEl);
+		this.scrollToEndBtnEl.onclick = function(e) {
+			let n = -1;
+			for (let i = 0; i < t.slots.length; i++) {
+				let el = t.slots[i].columnItem;
+				let r = el.getBoundingClientRect();
+				if (r.left == CSS_GAP) {
+					n = i + 1;
+					break;
+				} else if (!t.rtl && r.left > CSS_GAP) {
+					n = i;
+					break;
+				} else if (t.rtl && r.left < CSS_GAP) {
+					n = i + 1;
+					break;
+				}
+			}
+			if (n != -1 && n < t.slots.length)
+				t.slots[n].columnItem.scrollIntoView({
+					behavior: 'smooth',
+					inline: t.rtl ? 'start' : (t.smartphone ? 'end' : 'start')
+				});
+		};
+		//
+		this.goToEndBtnEl = document.createElement('div');
+		this.goToEndBtnEl.classList.add('svg-btn');
+		this.goToEndBtnEl.innerHTML = ICON_ARROWS_NEXT_VERTICAL;
+		this.footerEl.appendChild(this.goToEndBtnEl);
+		this.goToEndBtnEl.onclick = function(e) {
+			let n = -1;
+			for (let i = 0; i < t.slots.length; i++) {
+				let el = t.slots[i].columnItem;
+				let r = el.getBoundingClientRect();
+				if (r.top >= HEADER_HEIGHT + CSS_GAP) {
+					n = i;
+					break;
+				}
+			}
+			if (n != -1 && n < t.slots.length)
+				t.slots[n].columnItem.scrollIntoView({
+					behavior: 'smooth',
+					block: 'start'
+				});
+		};
+		//
+		this.columnListEl = document.createElement('ul');
+		this.columnListEl.classList.add('column__list');
+		this.mainEl.appendChild(this.columnListEl);
+		//
+		document.body.appendChild(this.headerEl);
+		document.body.appendChild(this.mainEl);
+		document.body.appendChild(this.footerEl);
+		//
+ 		window.onresize = function () {
+			if (document.fullscreenElement == null)
+				document.body.style.height = '100vh';
+ 			else
+				document.body.style.height = window.innerHeight + 'px'; // Solution for footer location problem on mobile browser
+ 			t.resizeAllCards();
+ 		};
+ 		window.onresize();
+ 		//
+ 		document.body.addEventListener('keydown', (e) => {
+ 			if (e.which == 37) { // Left
+ 				t.mainEl.scrollLeft = --t.mainEl.scrollLeft;
+ 			} else if (e.which == 38) { // Up
+ 				t.mainEl.scrollTop = --t.mainEl.scrollTop;
+ 			} else if (e.which == 39) { // Right
+ 				t.mainEl.scrollLeft = ++t.mainEl.scrollLeft;
+ 			} else if (e.which == 40) { // Dn
+ 				t.mainEl.scrollTop = ++t.mainEl.scrollTop;
+ 			} else if (e.which == 33) { // PgUp
+ 	 	 		e.preventDefault();
+ 				if (!t.scrollToStartBtnEl.hidden && t.scrollToStartBtnEl.style.display != 'none')
+ 					t.scrollToStartBtnEl.click();
+ 				else if (!t.goToStartBtnEl.hidden && t.goToStartBtnEl.style.display != 'none')
+ 					t.goToStartBtnEl.click();
+ 			} else if (e.which == 34) { // PgDn
+ 	 	 		e.preventDefault();
+ 				if (!t.scrollToEndBtnEl.hidden && t.scrollToEndBtnEl.style.display != 'none')
+ 					t.scrollToEndBtnEl.click();
+ 				else if (!t.goToEndBtnEl.hidden && t.goToEndBtnEl.style.display != 'none')
+ 					t.goToEndBtnEl.click();
+ 			} else if (e.which == 36) { // Home
+ 				if (!t.goToStartBtnEl.hidden && t.goToStartBtnEl.style.display != 'none')
+ 					t.slots[0].columnItem.scrollIntoView({
+						behavior: 'smooth',
+						block: 'start'
+					});
+ 			} else if (e.which == 35) { // End
+				if (!t.goToEndBtnEl.hidden && t.goToEndBtnEl.style.display != 'none')
+					t.slots[t.slots.length - 1].columnItem.scrollIntoView({
+						behavior: 'smooth',
+						block: 'start'
+					});
+			} else if (e.which == 112) { // F1
+	 			let help_urlObj = sys_properties['help_url'];
+	 			if (help_urlObj !== undefined) {
+	 				e.preventDefault();
+	 				let help_url = t.getString(help_urlObj);
+	 				openInNewTab(help_url);
+	 			}
+ 			} else
+ 				t.searchEl.focus();
+ 		});
+ 		t.searchEl.focus();
+ 		//
+		document.addEventListener('keydown', (e) => {
+			e = e || window.event;
+			if (e.keyCode == 27) { // ESC
+				t.slots.forEach((slot) => {
+					slot.cards.forEach((card) => {
+						if (card.maximized) {
+							card.toggleMaximize();
+							return;
+						}
+					});
+				});
+			}
+		});
+		//
+		if (window.navigator.onLine) {
+			this.statusIconEl.classList.remove('header-status-indicator-offline');
+			this.statusIconEl.classList.add('header-status-indicator-online');
+			this.statusTextEl.style.color = getCssValue('--color-indicator-online-foreground');
+		} else {
+			this.statusIconEl.classList.remove('header-status-indicator-online');
+			this.statusIconEl.classList.add('header-status-indicator-offline');
+			this.statusTextEl.style.color = getCssValue('--color-indicator-offline-foreground');
+		}
+		//
+		window.addEventListener('online', function(e) {
+			t.statusIconEl.classList.remove('header-status-indicator-offline');
+			t.statusIconEl.classList.add('header-status-indicator-online');
+			t.statusTextEl.style.color = getCssValue('--color-indicator-online-foreground');
+			t.statusTextEl.textContent = t.getString(sys_properties['status_text_online']);
+		});
+		window.addEventListener('offline', function(e) {
+			t.statusIconEl.classList.remove('header-status-indicator-online');
+			t.statusIconEl.classList.add('header-status-indicator-offline');
+			t.statusTextEl.style.color = getCssValue('--color-indicator-offline-foreground');
+			t.statusTextEl.textContent = t.getString(sys_properties['status_text_offline']);
+		});
+		//
+		const HEADER_HEIGHT = t.headerEl.getBoundingClientRect().height;
+	}
+
+	manageLang() {
+		const t = this;
+		//
+		t.rtl = rtlByLang(t.lang);
+		document.documentElement.style.direction = t.rtl ? 'rtl' : 'ltr';
+		//
+		t.swithLangBtnEl.innerHTML = '<svg width="24" height="24"><text x="' + (t.rtl ? 20 : 4) + '", y="17">' + t.lang + '</text></svg>';
+		let search_placeholder = t.getString(sys_properties['search_placeholder']);
+		t.searchEl.setAttribute('placeholder', search_placeholder);
+		//
+		t.scrollToStartBtnEl.innerHTML = arrowPrevHorizontal(t.rtl);
+		t.scrollToEndBtnEl.innerHTML = arrowNextHorizontal(t.rtl);
+		//
+		document.title = t.getString(sys_properties['name']);
+		t.titleEl.textContent = t.getString(sys_properties['title']);
+		t.statusTextEl.textContent = window.navigator.onLine ? t.getString(sys_properties['status_text_online']) : t.getString(sys_properties['status_text_offline']);
+		//
+		for (let i = 0; i < sys_groups.length; i++) {
+			let slotObj = sys_groups[i];
+			let slotTitleObj = slotObj['title']; 
+			let slot = t.slots[i]; 
+			if (slot.minimized)
+				slot.slotMinimizeEl.innerHTML = arrowNextHorizontal(t.rtl);
+			if (slotTitleObj !== undefined) {
+				let slotTitle = t.getString(slotTitleObj);
+				slot.setTitle(slotTitle);
+			}
+			let cards = slot.cards;
+			for (let j = 0; j < cards.length; j++) {
+				let cardObj = slotObj['cards'][j];
+				let cardTitleObj = cardObj['title'];
+				if (cardTitleObj !== undefined) {
+					let cardTitle = t.getString(cardTitleObj);
+					let card = slot.cards[j];
+					card.cardBackEl.innerHTML = arrowPrevHorizontal(t.rtl);
+					if (card.minimized)
+						card.cardMinimizeEl.innerHTML = arrowNextHorizontal(t.rtl);
+					if (card.ui.onLang != undefined)
+						card.ui.onLang(card.cardContentEl.firstChild, card.obj, t.lang);
+					card.setTitle(cardTitle);
+				}
+			}
+		}
+	}
+
+	displayBrand(b) {
+		this.spacerEl.style.display = b ? 'block' : 'none';
+		this.titleWrapperEl.style.display = b ? 'flex' : 'none';
+		this.logoEl.style.display = b ? 'block' : 'none';
+	}
+
+	runEventHandler(eventName, data) {
+		const t = this;
+		//
+		let statusObj = sys_eventHandler(eventName, data);
+		if (statusObj === undefined || statusObj === null)
+			return;
+		//
+		let titleObj = statusObj['title'];
+		if (titleObj === undefined)
+			titleObj = eventName;
+		let titleObjStr = JSON.stringify(titleObj);
+		//
+		let icon = statusObj['icon'];
+		let statusColor = statusObj['statusColor'];
+		if (statusColor === undefined || statusColor === null)
+			statusColor = "#FFF";
+		//
+		let messageObj = statusObj['message'];
+		if (messageObj === undefined || messageObj === null)
+			messageObj = 'Event: ' + eventName + '<br>Data: ' + data;
+		let messageObjStr = JSON.stringify(messageObj);
+		// see: --enable-logging=stderr
+		let cons = statusObj['console'];
+		if (cons)
+			console.info(cons);
+		//
+		let notification = statusObj['notification'];
+		if (notification) {
+			const options = {
+					requireInteraction: true,
+					body: message,
+					icon: icon
+			};
+			new Notification(title, options);
+		}
+		//
+		let audioSrc = statusObj['audio'];
+		if (audioSrc !== undefined) {
+			let audio = new Audio(audioSrc);
+			let volume = statusObj['volume'];
+			if (volume === undefined || volume < 0 || volume > 1)
+				volume = 1;
+			audio.volume = volume;
+			audio.play();
+		}
+		//
+		let fetchUrl = statusObj['url'];
+		if (fetchUrl !== undefined) {
+				fetch(fetchUrl, statusObj).then(response => {
+					response.text().then(function (data) {
+						console.log('FETCH NOTIFICATION [' + eventName + "]: " + data);
+				});
+			});
+		}
+	}
+
+	handleEvents() {
+		const t = this;
+		//
+		for (let entry of sys_eventProviders) {
+			let type = entry['type'];
+			let interval = entry['interval'];
+			let url = makeAbsoluteUrl(entry['url']);
+			let eventNames = entry['events'];
+			if (eventNames.length == 0)
+				eventNames.push['message'];
+			if (type == 'WSS') {
+			    let eventName = eventNames[0];
+				let webSocket = new WebSocket(url);
+				webSocket.addEventListener('message', (event) => {
+					t.runEventHandler(eventName, event.data);
+					t.updateCards(type, eventName, event.data);
+				});
+				console.log('WSS URL: ' + url);
+			} else if (type == 'SSE') {
+				for (let eventName of eventNames) {
+					let eventSource = new EventSource(url);
+					eventSource.addEventListener(eventName, (event) => {
+						t.runEventHandler(eventName, event.data);
+						t.updateCards(type, eventName, event.data);
+					});
+				}
+				console.log('SSE URL: ' + url);
+			} else if (type == 'FETCH') {
+				let eventName = eventNames[0];
+				function fetchData(url, options) {
+					fetch(url, options).then(response => {
+						response.text().then(function (data) {
+							t.runEventHandler(eventName, data);
+							t.updateCards(type, eventName, data);
+						});
+					});
+				}
+
+				//
+				setTimeout(function(purl, pentry) {
+					fetchData(purl, pentry);
+				}, 1, url, entry);
+				if (interval != undefined && interval != 0)
+					setInterval(function(purl, pentry) {
+						fetchData(purl, pentry);
+					}, interval, url, entry);
+// 				if (interval === undefined || interval === 0)
+// 					fetchData(url, entry);
+// 				else {
+// 					setInterval(function(purl, pentry) {
+// 						fetchData(purl, pentry);
+// 					}, interval, url, entry);
+// 				}
+			} else if (type == 'FILE') {
+				function fetchData(purl) {
+					let scriptEl = document.getElementById('pullScript');
+					if (scriptEl != null)
+						scriptEl.parentElement.removeChild(scriptEl);
+					//
+					scriptEl = document.createElement('script');
+					scriptEl.onload = function () {
+						if (event === undefined)
+							event = 'message';
+						if (eventNames.includes(event)) {
+							t.runEventHandler(event, data);
+							t.updateCards(type, event, data);
+						}
+					}
+					scriptEl.id = 'pullScript';
+					document.head.appendChild(scriptEl);
+					scriptEl.src = purl;
+				}
+				//
+				setTimeout(function(purl) {
+					fetchData(purl);
+				}, 500, url);
+				if (interval != undefined && interval != 0)
+					setInterval(function(purl) {
+						fetchData(purl);
+					}, interval, url);
+			}
+			console.log('Event Source Registered: type: ' + type + ', URL: ' + url + ', interval: ' + interval + '(ms)');
+		}
+	}
+	
+	getString(x) {
+		return getString(x, this.lang);
+	}
+
+	setFooterVisible(b) {
+		if (this.footer)
+			this.footerEl.style.display = b ? 'flex' : 'none';
+		else
+			this.footerEl.style.display = 'none';
+	}
+
+	manageFooterButtons() {
+		const t = this;
+		//
+		if (t.wrap) {
+			t.scrollToStartBtnEl.style.display = 'none';
+			t.scrollToEndBtnEl.style.display = 'none';
+			t.goToStartBtnEl.style.display = 'block';
+			t.goToEndBtnEl.style.display = 'block';
+		} else {
+			t.scrollToStartBtnEl.style.display = 'block';
+			t.scrollToEndBtnEl.style.display = 'block';
+			t.goToStartBtnEl.style.display = 'none';
+			t.goToEndBtnEl.style.display = 'none';
+		}
+	}
+
+	hideFooterButtons(b) {
+		const t = this;
+		//
+		t.toggleResponsiveBtnEl.style.display = b ? 'none' : 'block';
+		t.scrollToStartBtnEl.style.display = b ? 'none' : 'block';
+		t.scrollToEndBtnEl.style.display = b ? 'none' : 'block';
+		t.goToStartBtnEl.style.display = b ? 'none' : 'block';
+		t.goToEndBtnEl.style.display = b ? 'none' : 'block';
+	}
+
+	manageGapsAndBorders() {
+		const t = this;
+		//
+		for (let i = 0; i < this.slots.length; i++) {
+			if (this.slots[i].minimized && i != this.slots.length - 1 && this.wrap)
+				this.slots[i].slotHeaderEl.style.borderBottom = '1px solid var(--color-desktop-background)';
+			else
+				this.slots[i].slotHeaderEl.style.borderBottom = 'none';
+			//
+			if (this.slots[i].minimized && i != 0 && this.wrap)
+				this.slots[i].slotHeaderEl.style.marginTop = 'calc( - 2 * var(--gap) )';
+			else
+				this.slots[i].slotHeaderEl.style.marginTop = 'var(--gap)';
+		}
+	}
+
+	static isMobileBrowser() {
+		return window.self.innerWidth < 800;
+	}
+
+	setWrap(b) {
+		const t = this;
+		t.toggleResponsiveBtnEl.innerHTML = b ? ICON_SWAP_VERTICAL : ICON_SWAP_HORIZONTAL;
+		t.columnListEl.style.flexWrap = b ? 'wrap' : '';
+		t.slots.forEach((slot) => {
+			slot.slotSlideUpEl.style.display = b ? 'block' : 'none';
+		});
+	}
+	
+	resize() {
+		const t = this;
+		//
+		t.oneColumn = Dashboard.isOneColumn(this.slots);
+		this.searchEl.setAttribute('size', t.smartphone ? '1' : '22');
+		//
+		t.wrap = t.smartphone && !IFRAME;
+		t.setWrap(t.wrap);
+		//
+		t.manageFooterButtons();
+		t.manageGapsAndBorders();
+		//
+		if (t.smartphone) {
+			t.searchEl.style.flexGrow = '1';
+			t.searchBtnEl.hidden = false;
+			//
+			if (t.searchEl.hidden) {
+				t.titleWrapperEl.style.display = 'flex';
+				t.logoEl.style.display = 'block';
+			} else {
+				t.titleWrapperEl.style.display = 'none';
+				t.logoEl.style.display = 'none';
+			}
+		} else {
+			t.searchEl.style.flexGrow = '';
+			t.searchBtnEl.hidden = true;
+			t.searchEl.hidden = false;
+			//
+			t.titleWrapperEl.style.display = 'flex';
+			t.logoEl.style.display = 'block';
+		}
+
+		//
+		const btns = t.footerEl.querySelectorAll('.svg-btn');
+		this.slots.forEach((slot) => {
+			if (t.smartphone) {
+				slot.columnItem.style.width = '100%';
+				slot.columnItem.style.minWidth = '100%';
+				slot.columnItem.style.flexGrow = '1';
+			} else {
+				slot.columnItem.style.width = slot.width + 'px';
+				slot.columnItem.style.minWidth = slot.width + 'px';
+				slot.columnItem.style.flexGrow = '';
+			}
+		});
+		//
+		this.resizeAllCards();
+	}
+
+	resizeAllCards() {
+		this.slots.forEach((slot) => {
+			slot.cards.forEach((card) => {
+				card.resizeHandler();
+			});
+		});
+	}
+
+	static isPortrait() {
+		return window.innerHeight > window.innerWidth;
+	}
+
+	static isOneColumn(slots) {
+		const len = slots.length - 1;
+		for (let i = 0; i < len; i++)
+			if (slots[i].columnItem.offsetTop == slots[i + 1].columnItem.offsetTop)
+				return false;
+		return true;
+	}
+
+	setFavicon(url) {
+		let link = document.querySelector("link[rel='icon']");
+		if (link == null) {
+			link = document.createElement('link');
+			link.type = 'image/x-icon';
+			link.rel = 'shortcut icon';
+			document.head.appendChild(link);
+		}
+		link.href = url;
+	}
+
+	addSlot(slot) {
+		slot.serialNo = ++this.serialNoCounter;
+		slot.dashboard = this;
+		this.slots.push(slot);
+		this.columnListEl.append(slot.columnItem);
+	}
+
+	setVisible() {
+		console.log('Prepare dashboard to show...');
+		const t = this;
+		//
+		t.smartphone = Dashboard.isMobileBrowser();
+		//
+		let href = window.location.href;
+		let dir = href.substring(0, href.lastIndexOf('/'));
+		//
+		let opt = new Object(null);
+		opt.name = t.getString(sys_properties['title']);
+
+		opt.short_name = t.getString(sys_properties['name']);
+		opt.description = t.getString(sys_properties['title']);
+		//
+		/* NW START */
+		if (typeof process !== "undefined")
+			miAbout.click = function() {
+				let name = t.getString(sys_properties['name']);
+				let description = t.getString(sys_properties['title']);
+				alert(name + '\n' + description);
+			};
+		/* NW END */
+		//
+		opt.icons = [];
+		//
+		let icon192x192 = new Object(null);
+		icon192x192['src'] = 'icon192x192.png';
+		icon192x192['type'] = 'image/png';
+		icon192x192['sizes'] = '192x192';
+		opt.icons.push(icon192x192);
+		//
+		let icon512x512 = new Object(null);
+		icon512x512['src'] = 'icon512x512.png';
+		icon512x512['type'] = 'image/png';
+		icon512x512['sizes'] = '512x512';
+		opt.icons.push(icon512x512);
+		//
+		for (let i = 0; i < opt.icons.length; i++)
+			opt.icons[i].src = dir + '/' + opt.icons[i].src;
+		//
+		opt.start_url = href;
+		opt.display = "standalone";
+		opt.orientation = Dashboard.isPortrait() ? 'portrait' : 'landscape';
+		opt.background_color = getCssValue('--color-header-background');
+		opt.theme_color = getCssValue('--color-theme-background');
+		//
+		const stringManifest = JSON.stringify(opt);
+		const blob = new Blob([stringManifest], {
+			type: 'application/json'
+		});
+		const manifestURL = URL.createObjectURL(blob);
+		//
+		const link = document.createElement('link');
+		link.rel = 'manifest';
+		document.head.appendChild(link);
+		link.href = manifestURL;
+		//
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.ready.then(function(registration) {
+				console.log('Service Worker Ready, OK');
+			});
+			//
+			let s = 'icon192x192.png,icon512x512.png';
+			sys_resources.forEach((url) => {
+				s += ',' + url;
+			});
+			navigator.serviceWorker.register(dir + '/sw.js?u=' + s).then(function(registration) {
+					console.log('Service Worker Registered, OK');
+				}, function(error) {
+					console.warn('WARNING! Service worker registration failed:', error, '(Note: "DOMException" is OK if "file://" protocol used.)');
+			});
+		}
+		//
+		const meta_theme_color = document.createElement('meta');
+		meta_theme_color.name = 'theme-color';
+		document.head.appendChild(meta_theme_color);
+		meta_theme_color.content = opt.theme_color;
+		//
+		if (opt.icons.length != 0) {
+			t.setFavicon('icon192x192.png');
+			t.logoEl.src = 'icon192x192.png';
+		}
+		this.exclusiveCardId = URL_PARAMS.get('card');
+		this.debug = URL_PARAMS.get('debug') === 'true';
+		//
+		const header = URL_PARAMS.get('header')   === 'true' || (URL_PARAMS.get('header')  === null && (sys_properties['header']         || sys_properties['header']  === undefined));
+		const footer = URL_PARAMS.get('footer')   === 'true' || (URL_PARAMS.get('footer')  === null && (sys_properties['footer']         || sys_properties['footer']  === undefined));
+		//
+		let stand_by_timeout_sec = URL_PARAMS.get('stand_by_timeout_sec');
+		if (stand_by_timeout_sec === null) {
+			stand_by_timeout_sec = sys_properties['stand_by_timeout_sec'];
+			if (stand_by_timeout_sec === undefined)
+				stand_by_timeout_sec = 180; // 3 minutes
+		} else
+			stand_by_timeout_sec = parseInt(stand_by_timeout_sec);
+		t.stand_by_timeout_ms = 1000*stand_by_timeout_sec;
+		//
+		let expand = URL_PARAMS.get('expand');
+		if (expand === null) {
+			expand = sys_properties['expand'];
+			if (expand === undefined)
+				expand = t.smartphone ? '2' : '0';
+			else
+				expand = expand.toString();
+		}
+		//
+		const search = URL_PARAMS.get('search');
+		const tagsStr = URL_PARAMS.get('tags');
+		const bookmarks = URL_PARAMS.get('bookmarks');
+		//
+		if (bookmarks == null || bookmarks == 'on,off') {
+			this.showBookmarked = true;
+			this.showNonBookmarked = true;
+			this.bookmarkState = BOOKMARK_STATE_ON;
+		} else if (bookmarks == 'on') {
+			this.showBookmarked = true;
+			this.showNonBookmarked = false;
+			this.bookmarkState = BOOKMARK_STATE_OFF;
+		} else if (bookmarks == 'off') {
+			this.showBookmarked = false;
+			this.showNonBookmarked = true;
+			this.bookmarkState = BOOKMARK_STATE_BOTH;
+		}
+		//
+		if (tagsStr == null)
+			this.tags = [];
+		else
+			this.tags = tagsStr.split(',');
+		//
+		if (search !== null) {
+			this.searchEl.value = search;
+			let event = new Event('input', {
+				'bubbles': true,
+				'cancelable': true
+			});
+			this.searchEl.dispatchEvent(event);
+		} else
+			Dashboard.processSlots(this);
+
+		//
+		if (expand == '2')
+			this.collapseBtnEl.click();
+		else if (expand == '1') {
+			this.collapseBtnEl.click();
+			this.collapseBtnEl.click();
+		}
+		//
+		this.resize();
+		//
+		if (!header)
+			this.headerEl.style.display = 'none';
+		if (!footer) {
+			this.footer = false;
+			this.setFooterVisible(false);
+		}
+		//
+		this.slots.forEach((slot) => {
+			slot.cards.forEach((card) => {
+				card.manageBookmark(card.isBookmark());
+			});
+		});
+		//
+		if (!this.smartphone)
+			this.searchEl.focus();
+		//
+		this.manageHover();
+		//
+		t.columnListEl.style.visibility = 'visible';
+		setTimeout(function() {
+			t.slots.forEach((slot) => {
+				slot.cards.forEach((card) => {
+					if (card.slot.dashboard.exclusiveCardId == card.slot.serialNo + ':' + card.serialNo)
+						if (!card.cardEl.hidden) {
+							card.toggleMaximize();
+							return;
+						}
+				});
+			});
+		}, 1000);
+		setInterval(function() {
+			let now = new Date();
+			let dow = now.toLocaleDateString(t.lang, { weekday: 'short' }).toUpperCase();
+			//
+			t.clockTimeHhEl.innerHTML = formatTime(now.getHours());
+			t.clockTimeSepEl1.innerHTML = ':';
+			t.clockTimeMmEl.innerHTML = formatTime(now.getMinutes());
+			t.clockTimeSepEl2.innerHTML = ':';
+			t.clockTimeSsEl.innerHTML = formatTime(now.getSeconds());
+			t.clockDateEl.innerHTML = now.toISOString().substring(0, 10) + ' ' + dow;
+		}, 1000);
+		//
+		if (stand_by_timeout_sec > 0) {
+			document.documentElement.addEventListener("mousemove", (e) => t.stopIdle(), false);
+			document.documentElement.addEventListener("mousedown", (e) => t.stopIdle(), false);
+			document.documentElement.addEventListener("mousewheel", (e) => t.stopIdle(), false);
+			document.documentElement.addEventListener("touchmove", (e) => t.stopIdle(), false);
+			document.body.addEventListener("keydown", (e) => t.stopIdle(), false);
+			window.addEventListener("resize", (e) => t.stopIdle(), false);
+			//
+			t.startIdle();
+		}
+		//
+		if (t.smartphone)
+			t.manageFooterButtons();
+		t.manageLang();
+		//
+		console.log('Dashboard is ready, OK');
+	}
+
+	startIdle() {
+		const t = this;
+		t.sleepTemeout = setTimeout(function() {
+			t.idle = true;
+			t.toggleResponsiveBtnEl.style.display = 'none';
+			t.clockWrapperEl.style.display = 'flex';
+		}, t.stand_by_timeout_ms);
+	}
+	stopIdle() {
+		const t = this;
+		clearTimeout(t.sleepTemeout);
+		t.toggleResponsiveBtnEl.style.display = 'block';
+		t.clockWrapperEl.style.display = 'none';
+		t.startIdle();
+	}
+	
+	manageHover() {
+		let els = [...document.querySelectorAll('.svg-btn')];
+		els.push(this.mainEl);
+		els.forEach((el) => {
+			if (TOUCH_DEVICE)
+				el.classList.remove('non-touch-device');
+			else
+				el.classList.add('non-touch-device');
+		});
+	}
+
+	updateCards(type, event, data) {
+		const t = this;
+		//
+		for (let i = 0; i < t.slots.length; i++) {
+			let slot = t.slots[i];
+			for (let j = 0; j < slot.cards.length; j++) {
+				let card = slot.cards[j];
+				if (card.events !== undefined && !card.events.includes(event))
+					continue;
+				if (t.debug)
+					console.log('*** Event *** type: ' + type + ', event: ' + event + ', data: ' + data);
+				//
+				if (card.ui.onEvent != undefined)
+					card.ui.onEvent(card.cardContentEl.firstChild, card.obj, event, data, t.lang);
+			}
+		}
+	}
+	
+	static show(elem) {
+		// Get the natural height of the element
+		let getHeight = function() {
+			elem.style.display = 'block'; // Make it visible
+			let height = elem.scrollHeight + 'px'; // Get it's height
+			elem.style.display = ''; // Hide it again
+			return height;
+		};
+
+		let height = getHeight(); // Get the natural height
+		elem.classList.add('is-visible'); // Make the element visible
+		elem.style.height = height; // Update the max-height
+
+		// Once the transition is complete, remove the inline max-height so the
+		// content can scale responsively
+		window.setTimeout(function() {
+			elem.style.height = '';
+		}, 450);
+	};
+
+	static hide(elem) {
+		// Give the element a height to change from
+		elem.style.height = elem.scrollHeight + 'px';
+
+		// Set the height back to 0
+		window.setTimeout(function() {
+			elem.style.height = '0';
+		}, 1);
+
+		// When the transition is complete, hide it
+		window.setTimeout(function() {
+			elem.classList.remove('is-visible');
+		}, 450);
+	};
+
+	static findInText(s, text) {
+		let pos = text.indexOf(s);
+		if (pos == -1)
+			return text;
+		if (pos > 0 && text.charAt(pos - 1) == '<' && text.charAt(pos + 1) == '>') // allowed HTML tags: b, i, u
+			return text;
+		let n = pos + s.length;
+		return text.substring(0, pos) + '<mark>' + text.substring(pos, n) + '</mark>' + text.substring(n);
+	}
+
+	static processCard(card) {
+		let v;
+		//
+		if (card.slot.dashboard.showBookmarked && card.slot.dashboard.showNonBookmarked)
+			v = true;
+		else {
+			let bookmark = card.isBookmark();
+			if (card.slot.dashboard.showBookmarked)
+				v = bookmark;
+			else if (card.slot.dashboard.showNonBookmarked)
+				v = !bookmark;
+		}
+		//
+		let search = card.slot.dashboard.searchDashboard.trim();
+		if (v) {
+			if (search.startsWith('#')) {
+				let stags = search.split('#');
+				stags.forEach((stag) => {
+					stag = stag.trim();
+					if (stag.endsWith(','))
+						stag = stag.substring(0, stag.length - 1).trim();
+					if (stag != '')
+						if (!card.tags.includes(stag)) {
+							v = false;
+							return;
+						}
+				});
+			} else {
+				let htmlCardTitle = Dashboard.findInText(search, card.title);
+				card.cardTitileEl.innerHTML = htmlCardTitle;
+				if (search != '')
+					v = htmlCardTitle != card.title;
+			}
+		}
+		//
+		if (v)
+			v = card.slot.dashboard.tags.every((val) => {
+				return card.tags.indexOf(val) >= 0;
+			});
+		//
+		card.cardEl.hidden = !v;
+		if (v)
+			card.resizeHandler();
+	}
+
+	static processSlots(dashboard) {
+		if (dashboard.showBookmarked && dashboard.showNonBookmarked) {
+			dashboard.showBookmarksBtnEl.title = 'Bookmarked and Non-Bookmarked';
+			dashboard.showBookmarksBtnEl.innerHTML = ICON_STAR_HALF;
+		} else if (dashboard.showBookmarked) {
+			dashboard.showBookmarksBtnEl.title = 'Bookmarked';
+			dashboard.showBookmarksBtnEl.innerHTML = ICON_STAR_ON;
+		} else if (dashboard.showNonBookmarked) {
+			dashboard.showBookmarksBtnEl.title = 'Non-Bookmarked';
+			dashboard.showBookmarksBtnEl.innerHTML = ICON_STAR_OFF;
+		}
+		//
+		dashboard.slots.forEach((slot) => {
+			slot.cards.forEach((card) => {
+				Dashboard.processCard(card);
+			});
+		});
+		dashboard.slots.forEach((slot) => {
+			let allCardsHidden = true;
+			slot.cards.forEach((card) => {
+				if (!card.cardEl.hidden) {
+					allCardsHidden = false;
+					return;
+				}
+			});
+			slot.columnItem.hidden = allCardsHidden;
+		});
+	}
+}
+
+function createDashboard() {
+	console.log('Initialize dashboard...');
+	//
+	let lang = URL_PARAMS.get('lang');
+	let langs = sys_properties['langs'];
+	if (langs === undefined)
+		langs = ['en'];
+	if (lang == null) {
+		lang = langs[0];
+	} else {
+		let n = langs.indexOf(lang);
+		if (n == -1)
+			lang = langs[0];
+	}
+	//
+	let default_group_width_px = sys_properties['default_group_width_px'];
+	let default_card_height_px = sys_properties['default_card_height_px'];
+	let group_headers = sys_properties['group_headers'];
+	let card_headers = sys_properties['card_headers'];
+	//
+	let d = new Dashboard(lang, langs);
+	//
+	let zoom = URL_PARAMS.get('zoom_pct');
+	if (zoom == null)
+		zoom = sys_properties['zoom_pct'];
+	if (zoom != undefined && zoom != 100)
+		d.columnListEl.style.zoom = zoom + '%';
+	//
+	for (let i = 0; i < sys_groups.length; i++) {
+		let slotObj = sys_groups[i];
+		let groupWidth = slotObj['width'];
+		if (groupWidth == undefined)
+			groupWidth = default_group_width_px;
+		//
+		let slot = new Slot(groupWidth);
+		d.addSlot(slot);
+		let slotMinimizable = slotObj['minimizable'];
+		if (slotMinimizable === undefined)
+			slotMinimizable = true;
+		slot.setMinimizable(slotMinimizable);
+		//
+		let slotTitleObj = slotObj['title'];
+		if (slotTitleObj === undefined || !group_headers)
+			slot.hideTitleBar();
+		else
+			slot.setTitle(d.getString(slotTitleObj));
+		//
+		let cardObjs = slotObj['cards'];
+		for (let j = 0; j < cardObjs.length; j++) {		
+			let cardObj = cardObjs[j];
+			let cardUiClass = cardObj['class'];
+			if (cardUiClass === undefined)
+				cardUiClass = DefaultCardUi
+			let el = document.createElement('div');
+			el.style.margin = 'var(--gap)';
+			let card = new Card();
+			card.ui = eval(cardObj['class']);
+			card.events = cardObj['events'];
+			card.tags = cardObj['tags'];
+			let cardMinimizable = cardObj['minimizable'];
+			if (cardMinimizable === undefined)
+				cardMinimizable = true;
+			card.setMinimizable(cardMinimizable);
+			
+			let cardTitleObj = cardObj['title'];
+			if (cardTitleObj === undefined || !card_headers)
+				card.hideTitleBar();
+			else
+				card.setTitle(d.getString(cardTitleObj));
+			//
+			card.cardContentEl.innerHTML = '';
+			el.classList.add('card-content');
+			card.cardContentEl.appendChild(el);
+			card.addGlassPane();
+			//
+			slot.addCard(card);
+			if (cardUiClass !== undefined) {
+				card.ui = eval('new ' + cardUiClass + '()');
+				if (card.ui.onAttach != undefined)
+					card.obj = card.ui.onAttach(el, d.lang);
+				//
+				let interactive;
+				if (card.ui.isInteractive == undefined)
+					interactive = true;
+				else
+					interactive = card.ui.isInteractive(false);
+				card.glassPaneEl.hidden = interactive;
+				//
+				let selfHeight;
+				if (card.ui.isSelfHeight !== undefined)
+					selfHeight = card.ui.isSelfHeight();
+				else
+					selfHeight = false;
+				//
+				let cardHeight = cardObj['height'];
+				if (cardHeight === undefined) {
+					if (default_card_height_px !== undefined)
+						if (!selfHeight)
+							el.style.height = default_card_height_px + 'px';
+				} else
+					el.style.height = cardHeight + 'px';
+			}
+ 		}
+	}
+	d.setVisible();
+	d.handleEvents();
+	console.log('Dashboard initialized, OK');
+}
+
+function loadExternalsAndStartingDashboard() {
+	let noExternals = sys_resources.length == 0;
+	if (noExternals) {
+		console.warn('WARNING! No externals specified in dashboard configuration file.');
+		createDashboard();
+	} else {	
+		console.log('Load externals...');
+		let externals = [];
+		let k = 0;
+		for (let i = 0; i < sys_resources.length; i++) {
+			let href = sys_resources[i];
+			let external = { 'href': href };
+			externals.push(external);
+			let el;
+			if (href.endsWith('.css')) {
+				el = document.createElement('link');
+				el.rel = "stylesheet";
+				el.type = 'text/css';
+				el.href = href;
+			} else if (href.endsWith('.js')) {
+				el = document.createElement('script');
+				el.src = href;
+			}
+			el.setAttribute('data-serial', i);
+			el.onload = function (e) {
+				let el = e.currentTarget;
+				let n = parseInt(el.getAttribute('data-serial'));
+				console.log(n + '. ' + externals[n]['href'] + ', OK');
+				let external = externals[n];
+				external['loaded'] = true;
+				if (n == k) {
+					if (k < externals.length - 1) {
+						k++;
+						//console.log(k + '. ' + externals[k]['href'] + ' Loading...');
+						document.head.appendChild(externals[k]['el']);
+					} else {
+						console.log('All externals loaded, OK');
+						createDashboard();
+					}
+				}
+			};
+			external['el'] = el;
+			if (i == 0) {
+				//console.log('0. ' + externals[0]['href'] + ' Loading...');
+				document.head.appendChild(el);
+			}
+		}
+	}
+}
+//
+let badTheme = getCssValue('--color-theme-background').length == 0;
+let badConfig = typeof sys_properties === 'undefined';
+if (badTheme || badConfig) {
+	let href = window.location.href;
+	let dir = href.substring(0, href.lastIndexOf('/'));
+	//
+	let msg = '';
+	let file;
+	//
+	if (badConfig) {
+		file = dir + '/config.js';
+		// <!--
+		msg += '\nError: File <strong>config.js</strong> is missing or corrupted.\n  URL: <a href="'+ file + '">' + file + '</a>\n';
+		// -->
+	}
+	//
+	if (badTheme) {
+		file = dir + '/theme.css';
+		// <!--
+		msg += '\nError: File <strong>theme.css</strong> is missing or corrupted.\n  URL: <a href="'+ file + '">' + file + '</a>\n';
+		// -->
+	}
+	//
+	printText(msg);
+} else {
+	//
+	var saved_config_version = configAsString();
+	//
+	let grayscale = URL_PARAMS.get('grayscale');
+	if (sys_properties['grayscale']) {
+		setGrayscale(true);
+		if ((grayscale != null && grayscale != 'true')) // grayscale supressed by parameter
+			setGrayscale(false);
+	} else {
+		if (grayscale == 'true')
+			setGrayscale(true);
+	}
+	//
+	printInfo();
+	//
+	if (URL_PARAMS.get('about')) {
+		let href = window.location.href;
+		let dir = href.substring(0, href.lastIndexOf('/'));
+		let msg;
+		let file;
+		// <!--
+		file = dir + '/config.js';
+		msg  = 'Config:         <a href="'+ file + '">' + file + '</a>\n';
+		file = dir + '/theme.css';
+		msg += 'Theme:          <a href="'+ file + '">' + file + '</a>\n';
+		file = dir + '/sw.js';
+		msg += 'Service Worker: <a href="'+ file + '">' + file + '</a>';
+		// -->
+		printText(msg);
+	} else {
+		loadExternalsAndStartingDashboard();
+		//
+		let check_config_changed_interval_sec = sys_properties['check_config_changed_interval_sec'];
+		if (check_config_changed_interval_sec > 0)
+			setInterval(function() {
+				let oldScriptEl = document.querySelector('script[src="config.js"]');
+				let parent = oldScriptEl.parentElement;
+				let newScriptEl = document.createElement('script');
+				newScriptEl.setAttribute('src', 'config.js');
+				newScriptEl.onload = function() {
+					if (configAsString() !== saved_config_version)
+						location.reload(true);
+				};
+				parent.removeChild(oldScriptEl);
+				parent.appendChild(newScriptEl);
+			}, check_config_changed_interval_sec * 1000);
+	}
+}
+</script>
+</html>
+
+<!-- EOF -->

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<!--
+MIT License
+
+Copyright (c) 2019 Nėuro Lab
+https://neuro-lab.github.io
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Home:   https://neuro-lab.github.io
+E-Mail: neuro.lab.team@gmail.com
+
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="ckLGCMdF_OhAMwwPdAkAGC2Jplg56Iy5hL5Nqc2C7kM" />
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="preconnect" href="https://neuro-lab.github.io" crossorigin>
+<link rel="preload" href="assets/fonts/roboto-condensed-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="assets/fonts/Monoton-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<link rel="preload" href="assets/images/bg.jpeg" as="image" type="image/jpeg" crossorigin="anonymous">
+
+<link rel="prerender" href="//neuro-lab.github.io/index.html" crossorigin>
+<link rel="prerender" href="//neuro-lab.github.io/nero-for-sturtups.html" crossorigin>
+<link rel="prerender" href="//neuro-lab.github.io/quick-start.html" crossorigin>
+<link rel="prerender" href="//neuro-lab.github.io/neuro/prod/" crossorigin>
+
+<title>NĖURO</title>
+
+<style type="text/css">
+
+@font-face {
+	font-display: block;
+	font-family: 'Roboto Condensed';
+	src: url('assets/fonts/roboto-condensed-regular.woff2') format('woff2')
+}
+
+@font-face {
+	font-display: block;
+	font-family: 'Monoton';
+	src: url('assets/fonts/Monoton-Regular.woff2') format('woff2')
+}
+
+html {
+	height:100%;
+	min-height:100%;
+	margin: 0;
+	padding: 0;
+	background: url("assets/images/bg.jpeg") no-repeat center center fixed;
+	background-size: cover;
+	user-select: none;
+	cursor: pointer;
+}
+
+html, html * { 
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+.header {
+	display: inline-block;
+	background: #fff;
+	opacity: .6;
+	width: 100%;
+	height: auto;
+	text-align: center;
+	padding: 2rem;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.text {
+	font-family: 'Roboto Condensed', 'sans-serif-condensed', 'sans';
+	color: #000;
+}
+
+.title {
+	line-height: 6.5rem;
+	font-size: 6.5rem;
+	font-weight: bold;	
+}
+
+.sub-title-1 {
+	font-size: 1.95rem;
+}
+
+.sub-title-2 {
+	font-size: 3.5rem;
+	margin-top: -1.8rem; 
+}
+
+.button {
+	color: #c70d3a !important;
+	text-align: center;
+	text-decoration: none;
+	font-family: 'Monoton';
+	cursor: pointer;
+	font-size: 2.5rem;
+	padding: 2rem;
+	margin: auto;
+	position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@media only screen and (max-height: 500px) {
+	.button {
+		transform: translate(-50%, 0%);
+	}
+}
+
+a.button, a.button:hover, a.button:visited, a.button:active {
+	color: #c70d3a;
+}
+
+
+</style>
+</head>
+<body>
+	<div class="header">
+		<span class="text title">N<span style="color: #c70d3a">Ė</span>URO</span>
+		<br>
+		<div class="text sub-title-1">100% PURE FRONTEND</div><br>
+		<div class="text sub-title-2">DASHBOARD</div>
+	</div>
+
+	<a class="button" href="quick-start.html">
+		GET&nbsp;&nbsp;STARTED
+	</a>
+	<script type="text/javascript">
+	document.documentElement.addEventListener('click', (e) => {
+		e.stopPropagation();
+		document.querySelector('.button').click();
+	});
+	</script>
+</body>
+</html>

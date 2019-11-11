@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<url>
+		<loc>https://neuro-lab.github.io/</loc>
+		<lastmod>2019-11-17T22:18:12+00:00</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>1.00</priority>
+	</url>
+	<url>
+		<loc>https://neuro-lab.github.io/neuro/prod/</loc>
+		<lastmod>2019-11-17T22:18:12+00:00</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.80</priority>
+	</url>
+	<url>
+		<loc>https://neuro-lab.github.io/quick-start.html</loc>
+		<lastmod>2019-11-17T22:18:12+00:00</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.64</priority>
+	</url>
+	<url>
+		<loc>https://neuro-lab.github.io/nero-for-sturtups.html</loc>
+		<lastmod>2019-11-17T22:18:12+00:00</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.64</priority>
+	</url>
+	<url>
+		<loc>https://neuro-lab.github.io/event-providers.html</loc>
+		<lastmod>2019-11-17T22:18:12+00:00</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.64</priority>
+	</url>
+</urlset>
