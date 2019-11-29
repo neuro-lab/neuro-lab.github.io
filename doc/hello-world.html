@@ -149,12 +149,21 @@ main {
 	padding-left: 1rem !important;
 }
 
-p.note {
+.note {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+	padding: .7rem;
+	border-left: solid 4px;
+}
+
+.note-yellow {
 	background-color: #FFFBEA;
-	border-left: solid 4px #F4C312;
-	line-height: 18px;
-	overflow: hidden;
-	padding: 12px;
+	border-color: #F4C312;
+}
+
+.note-blue {
+	background-color: #E7F3FE;
+	border-color: #2196F3;
 }
 
 @media only screen and (min-width: 960px) {
@@ -211,19 +220,19 @@ p.note {
 		<br>
 	<h2>Example Steps</h2>
 	<br>
-	<ul style="margin-left: 1.5rem;">
-		<li>1) Create a simple dummy HTTP server <a target="_blank" href="../examples/backend/fetch.py">fetch.py</a> that process client requests and response with some random number as plain text
+	<ol style="margin-left: 1.5rem;">
+		<li>Start HTTP server from command line: <code class="prettyprint">./fetch.py</code>
+		<div class="note note-blue"><div style="margin-bottom: .4rem;"><strong>fetch.py</strong></div><a target="_blank" href="../examples/backend/fetch.py">fetch.py</a> is a simple dummy HTTP server that process client requests and response with random number in plain text form. Server URL is: <a href="http://localhost:8080">http://localhost:8080</a>
+		</div>
 		</li>
-		<li>2) Register our HTTP server URL as Event Source (ES) in <code class="prettyprint">sys_eventProviders</code> array of <a target="_blank" href="../examples/config.js">config.js</a></li>
-		<li>3) Run our HTTP server from command line: <code class="prettyprint">./fetch.py</code></li>
-		<li>4) Create simple JavaScript Visualization Plugin (VP) <a target="_blank" href="../examples/plugins/HelloWorldPlugin.js">HelloWorldPlugin.js</a> contains UI for our Dashboard Card (DC)
+		<li>Register our HTTP server URL <code style="border: 1px solid #ddd;">http://localhost:8080</code> as Event Source (ES) in <code class="prettyprint">sys_eventProviders</code> array of <a target="_blank" href="../examples/config.js">config.js</a></li>
+		<li>Create simple JavaScript Visualization Plugin (VP) <a target="_blank" href="../examples/plugins/HelloWorldPlugin.js">HelloWorldPlugin.js</a> contains UI for our Dashboard Card (DC)
 		</li>
-		<li>5) Register our Visualization Plugin (VP) plugin file name into <code class="prettyprint">sys_resources</code> array of <a target="_blank" href="../examples/config.js">config.js</a></li>
-		<li>6) Register Visualization Plugin (VP) plugin's class name into <code class="prettyprint">sys_groups</code> array of <a target="_blank" href="../examples/config.js">config.js</a></li>
-		<li>7) Open <span class="brand" style="opacity: .8;">NĖURO</span> dashboard by clicking on <code class="prettyprint">index.html</code></li>
-	</ul>
-	<br>
-	<p class="note"><strong>Note:</strong> You need <strong>python 3</strong> to run server side part of this example.</p>
+		<li>Register our Visualization Plugin (VP) plugin file name into <code class="prettyprint">sys_resources</code> array of <a target="_blank" href="../examples/config.js">config.js</a></li>
+		<li>Register Visualization Plugin (VP) plugin's class name into <code class="prettyprint">sys_groups</code> array of <a target="_blank" href="../examples/config.js">config.js</a></li>
+		<li>Open <span class="brand" style="opacity: .8;">NĖURO</span> dashboard by clicking on <code class="prettyprint">index.html</code></li>
+	</ol>
+	<p class="note note-yellow"><strong>Note:</strong> You need <strong>python 3</strong> to run server side part of this example.</p>
 	</p>
 	<br>
 	<br>
