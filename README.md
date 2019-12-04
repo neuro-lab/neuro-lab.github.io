@@ -38,7 +38,7 @@
 
 <h3>Whitepapers:</h3>
 <ul>
-	<li><a href="https://neuro-lab.github.io/nero-for-startups.html" target="_blank">NĖURO for Startups</a></li>
+	<li><a href="https://neuro-lab.github.io/doc/nero-for-startups.html" target="_blank">NĖURO for Startups</a></li>
 </ul>
 
 <h3>Quick Reference:</h3>
